@@ -122,164 +122,191 @@ QGX9RM6Z1Q — 10000 голды
 <p class="moving-text">
   Всю информацию про буст беру из тгк ters chennel
 </p>
-<p>
-  
-  <div id="quiz-container">
-    <h2 id="question">Загрузка вопроса...</h2>
-    <div id="answers"></div>
-    <div id="timer">Осталось времени: 10 секунд</div>
-    <div id="result"></div>
-  </div>
-</p>
-<p>
-<style>
-  #quiz-container {
-    font-family: Arial, sans-serif;
-    background-color: #111;
-    color: white;
-    padding: 20px;
-    border-radius: 10px;
-    max-width: 700px;
-    margin: 0 auto;
-  }
-  #question {
-    font-size: 24px;
-    background: linear-gradient(90deg, red, orange, yellow, green, blue, indigo, violet);
-    background-size: 200% auto;
-    color: transparent;
-    background-clip: text;
-    -webkit-background-clip: text;
-    animation: rgbText 3s linear infinite;
-  }
-  #answers button {
-    display: block;
-    margin: 5px 0;
-    padding: 10px;
-    border: none;
-    border-radius: 5px;
-    font-size: 16px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-  }
-  #answers button.correct {
-    background-color: green;
-    color: white;
-  }
-  #answers button.incorrect {
-    background-color: red;
-    color: white;
-  }
-  #timer {
-    font-size: 20px;
-    text-align: center;
-    margin-bottom: 20px;
-    color: #fff;
-  }
-  @keyframes rgbText {
-    0% { background-position: 0% 50%; }
-    100% { background-position: 200% 50%; }
-  }
-</style>
+<p id="quiz-container" style="
+  font-size: 20px;
+  font-family: sans-serif;
+  font-weight: bold;
+  padding: 20px;
+  border-radius: 10px;
+  background: black;
+  color: white;
+  text-align: center;
+  transition: all 0.5s ease;
+"></p>
 
 <script>
-  const quizData = [
-    // (20 вопросов - те же что выше, можешь вставить их сюда)
-  ];
+const container = document.getElementById("quiz-container");
 
-  let currentQuestion = 0;
-  let score = 0;
-  let timer;
-  let timeLeft = 10;
+const questions = [
+  {
+    question: "В каком году вышла игра Standoff 2?",
+    answers: ["2016", "2017", "2018", "2015"],
+    correct: 1
+  },
+  {
+    question: "Кем разработана игра Standoff 2?",
+    answers: ["Activision", "Valve", "Axlebolt", "Epic Games"],
+    correct: 2
+  },
+  {
+    question: "Какая карта есть в Standoff 2?",
+    answers: ["Dust 2", "Sandstone", "Inferno", "Mirage"],
+    correct: 1
+  },
+  {
+    question: "Сколько игроков максимум в одной команде?",
+    answers: ["3", "4", "5", "6"],
+    correct: 2
+  },
+  {
+    question: "Какой режим игры отсутствует?",
+    answers: ["Командный бой", "Бой насмерть", "Зомби режим", "Закладка бомбы"],
+    correct: 2
+  },
+  {
+    question: "Что такое 'frag' в игре?",
+    answers: ["Урон", "Убийство", "Граната", "Персонаж"],
+    correct: 1
+  },
+  {
+    question: "Какой нож есть в Standoff 2?",
+    answers: ["Karambit", "Bayonet", "Butterfly", "Все варианты"],
+    correct: 3
+  },
+  {
+    question: "Можно ли обменивать скины в игре?",
+    answers: ["Да", "Нет", "Только за золото", "Только в магазине"],
+    correct: 0
+  },
+  {
+    question: "Что такое 'рейтинговый матч'?",
+    answers: ["Игра с ботами", "Матч без очков", "Матч за очки и звания", "Матч с друзьями"],
+    correct: 2
+  },
+  {
+    question: "Как называется валюта в игре?",
+    answers: ["Голды", "Коины", "Баксы", "Рубли"],
+    correct: 0
+  },
+  {
+    question: "Что выпадает из кейсов?",
+    answers: ["Кейсы", "Скины", "Бусты", "Золото"],
+    correct: 1
+  },
+  {
+    question: "Как называется зимняя карта?",
+    answers: ["Winterland", "Snowfall", "Icecity", "Frosty"],
+    correct: 1
+  },
+  {
+    question: "Какой скин самый редкий?",
+    answers: ["Common", "Legendary", "Epic", "Arcade"],
+    correct: 1
+  },
+  {
+    question: "Что даёт повышение ранга?",
+    answers: ["Награды", "Звания", "Скины", "Кейсы"],
+    correct: 1
+  },
+  {
+    question: "Как называется автомат в игре?",
+    answers: ["AKR", "M4A1", "MP5", "Glock"],
+    correct: 0
+  },
+  {
+    question: "Какой снайпер есть в игре?",
+    answers: ["AWM", "Scout", "VSS", "Barrett"],
+    correct: 0
+  },
+  {
+    question: "Что такое MVP?",
+    answers: ["Мини-граната", "Лучший игрок", "Новый режим", "Карта"],
+    correct: 1
+  },
+  {
+    question: "Что такое 'разминка'?",
+    answers: ["Настройка игры", "Первые 30 сек", "Режим обучения", "Пауза"],
+    correct: 1
+  },
+  {
+    question: "Можно ли кастомизировать HUD?",
+    answers: ["Нет", "Да", "Только кнопки", "Только карту"],
+    correct: 1
+  },
+  {
+    question: "Как получить скин бесплатно?",
+    answers: ["Покупка", "Купить кейс", "Обмен или дроп", "Нельзя"],
+    correct: 2
+  },
+];
 
-  const questionEl = document.getElementById("question");
-  const answersEl = document.getElementById("answers");
-  const timerEl = document.getElementById("timer");
-  const resultEl = document.getElementById("result");
+let current = 0;
+let score = 0;
+let timer;
+let timeLeft = 10;
 
-  function startQuiz() {
-    currentQuestion = 0;
-    score = 0;
+function showQuestion() {
+  if (current >= questions.length) {
+    container.innerHTML = `<p style="font-size:24px; color:lime;">Вы ответили правильно на ${score} из ${questions.length}</p>`;
+    return;
+  }
+
+  let q = questions[current];
+  container.innerHTML = `<div style="animation: rgbText 5s infinite;">${q.question}</div><br>`;
+  q.answers.forEach((ans, i) => {
+    container.innerHTML += `<button style="margin:5px; padding:10px; background:#222; color:white; border:none; border-radius:5px; cursor:pointer; transition:0.3s;" onclick="selectAnswer(${i})">${ans}</button><br>`;
+  });
+  container.innerHTML += `<p id="timer" style="margin-top:10px;">Осталось времени: ${timeLeft} секунд</p>`;
+
+  timeLeft = 10;
+  timer = setInterval(() => {
+    timeLeft--;
+    document.getElementById("timer").textContent = `Осталось времени: ${timeLeft} секунд`;
+    if (timeLeft === 0) {
+      clearInterval(timer);
+      showCorrect(null);
+    }
+  }, 1000);
+}
+
+function selectAnswer(i) {
+  clearInterval(timer);
+  showCorrect(i);
+}
+
+function showCorrect(selected) {
+  let buttons = container.querySelectorAll("button");
+  buttons.forEach((btn, i) => {
+    if (i === questions[current].correct) {
+      btn.style.background = "green";
+    } else if (i === selected) {
+      btn.style.background = "red";
+    } else {
+      btn.style.opacity = "0.5";
+    }
+    btn.disabled = true;
+  });
+
+  if (selected === questions[current].correct) score++;
+
+  setTimeout(() => {
+    current++;
     showQuestion();
-  }
+  }, 2000);
+}
 
-  function showQuestion() {
-    clearInterval(timer);
-    timeLeft = 10;
-    timerEl.textContent = `Осталось времени: ${timeLeft} секунд`;
-    timer = setInterval(() => {
-      timeLeft--;
-      timerEl.textContent = `Осталось времени: ${timeLeft} секунд`;
-      if (timeLeft === 0) {
-        clearInterval(timer);
-        showCorrectAnswer();
-        setTimeout(nextQuestion, 2000);
-      }
-    }, 1000);
+showQuestion();
+</script>
 
-    const q = quizData[currentQuestion];
-    questionEl.textContent = q.question;
-    answersEl.innerHTML = "";
-    q.answers.forEach((answer, index) => {
-      const btn = document.createElement("button");
-      btn.textContent = answer;
-      btn.onclick = () => checkAnswer(index);
-      answersEl.appendChild(btn);
-    });
-  }
-
-  function checkAnswer(index) {
-    clearInterval(timer);
-    const q = quizData[currentQuestion];
-    const buttons = answersEl.querySelectorAll("button");
-    buttons.forEach((btn, i) => {
-      btn.disabled = true;
-      if (i === q.correct) {
-        btn.classList.add("correct");
-      } else if (i === index) {
-        btn.classList.add("incorrect");
-      }
-    });
-    if (index === q.correct) {
-      score++;
-    } else {
-      resultEl.textContent = `Правильный ответ: ${q.answers[q.correct]}`;
-    }
-    setTimeout(() => {
-      resultEl.textContent = "";
-      nextQuestion();
-    }, 2000);
-  }
-
-  function showCorrectAnswer() {
-    const q = quizData[currentQuestion];
-    const buttons = answersEl.querySelectorAll("button");
-    buttons.forEach((btn, i) => {
-      btn.disabled = true;
-      if (i === q.correct) {
-        btn.classList.add("correct");
-      }
-    });
-    resultEl.textContent = `Время вышло! Правильный ответ: ${q.answers[q.correct]}`;
-  }
-
-  function nextQuestion() {
-    currentQuestion++;
-    if (currentQuestion < quizData.length) {
-      showQuestion();
-    } else {
-      showResults();
-    }
-  }
-
-  function showResults() {
-    questionEl.textContent = "Викторина завершена!";
-    answersEl.innerHTML = "";
-    timerEl.textContent = "";
-    resultEl.textContent = `Вы ответили правильно на ${score} из ${quizData.length} вопросов.`;
-  }
-
-  startQuiz();
-</script> <p>
+<style>
+@keyframes rgbText {
+  0% { color: red; }
+  25% { color: orange; }
+  50% { color: yellow; }
+  75% { color: cyan; }
+  100% { color: red; }
+}
+</style>
   
  
 
