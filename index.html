@@ -122,8 +122,17 @@ QGX9RM6Z1Q — 10000 голды
 <p class="moving-text">
   Всю информацию про буст беру из тгк ters chennel
 </p>
-<p><style>
-  .quiz-container {
+<p>
+  <div id="quiz-container">
+    <h2 id="question">Загрузка вопроса...</h2>
+    <div id="answers"></div>
+    <div id="timer">Осталось времени: 10 секунд</div>
+    <div id="result"></div>
+  </div>
+</p>
+
+<style>
+  #quiz-container {
     font-family: Arial, sans-serif;
     background-color: #111;
     color: white;
@@ -132,10 +141,7 @@ QGX9RM6Z1Q — 10000 голды
     max-width: 700px;
     margin: 0 auto;
   }
-  .question {
-    margin-bottom: 20px;
-  }
-  .question-title {
+  #question {
     font-size: 24px;
     background: linear-gradient(90deg, red, orange, yellow, green, blue, indigo, violet);
     background-size: 200% auto;
@@ -144,7 +150,7 @@ QGX9RM6Z1Q — 10000 голды
     -webkit-background-clip: text;
     animation: rgbText 3s linear infinite;
   }
-  .answers button {
+  #answers button {
     display: block;
     margin: 5px 0;
     padding: 10px;
@@ -154,11 +160,11 @@ QGX9RM6Z1Q — 10000 голды
     cursor: pointer;
     transition: background-color 0.3s ease;
   }
-  .answers button.correct {
+  #answers button.correct {
     background-color: green;
     color: white;
   }
-  .answers button.incorrect {
+  #answers button.incorrect {
     background-color: red;
     color: white;
   }
@@ -174,84 +180,132 @@ QGX9RM6Z1Q — 10000 голды
   }
 </style>
 
-<p>
-  <div class="quiz-container">
-    <div id="timer">Осталось времени: 60 секунд</div>
-    <div id="quiz"></div>
-  </div>
-</p>
-
 <script>
   const quizData = [
-    { q: "Когда вышла игра Standoff 2?", a: ["2016", "2017", "2018"], correct: 1 },
-    { q: "Какое оружие есть в игре?", a: ["M4", "AKR", "AK-74"], correct: 1 },
-    { q: "Сколько игроков в одной команде?", a: ["4", "5", "6"], correct: 1 },
-    { q: "Какой режим есть в игре?", a: ["Бой насмерть", "Песочница", "Приключение"], correct: 0 },
-    { q: "Какая карта самая популярная?", a: ["Sandstone", "Rust", "Inferno"], correct: 0 },
-    { q: "Что можно купить в магазине?", a: ["Скины", "Броню", "Кубы"], correct: 0 },
-    { q: "Какой нож есть в игре?", a: ["Karambit", "Flip Knife", "Bayonet"], correct: 0 },
-    { q: "Какой уровень максимальный?", a: ["70", "99", "100"], correct: 1 },
-    { q: "Что нужно для обмена скинами?", a: ["Золото", "Друг", "Кейсы"], correct: 1 },
-    { q: "Какой дробовик есть в игре?", a: ["SPAS", "M870", "XM1014"], correct: 1 },
-    { q: "Какой режим похож на CS:GO?", a: ["Закладка бомбы", "Королевская битва", "Выживание"], correct: 0 },
-    { q: "Сколько стоит боевой пропуск?", a: ["100g", "120g", "150g"], correct: 2 },
-    { q: "Где можно торговать скинами?", a: ["Маркет", "Склад", "Профиль"], correct: 0 },
-    { q: "Какая винтовка есть в игре?", a: ["M40", "AWP", "R700"], correct: 0 },
-    { q: "Какой пистолет есть в игре?", a: ["Desert Eagle", "Glock", "Makarov"], correct: 0 },
-    { q: "Какой цвет легендарного скина?", a: ["Фиолетовый", "Жёлтый", "Оранжевый"], correct: 2 },
-    { q: "Сколько кейсов можно открыть за раз?", a: ["1", "2", "3"], correct: 0 },
-    { q: "Как зовут разработчика?", a: ["AXLEBOLT", "VALVE", "GARENA"], correct: 0 },
-    { q: "Какой популярный ютубер по игре?", a: ["Мэйсон", "Аид", "Фрост"], correct: 0 },
-    { q: "Какой нож самый дорогой?", a: ["Karambit Gold", "Butterfly", "Flip Knife"], correct: 0 }
+    {
+      question: "Когда вышла игра Standoff 2 на Android?",
+      answers: ["2016", "2017", "2018"],
+      correct: 1
+    },
+    {
+      question: "Какой режим открывается на 15 уровне?",
+      answers: ["Союзники", "Соревновательный", "Эскалация"],
+      correct: 0
+    },
+    {
+      question: "Какой движок используется в Standoff 2?",
+      answers: ["Unreal Engine", "CryEngine", "Unity"],
+      correct: 2
+    },
+    {
+      question: "Сколько игроков в команде в режиме 'Закладка бомбы'?",
+      answers: ["4", "5", "6"],
+      correct: 1
+    },
+    {
+      question: "Какой режим открывается на 20 уровне?",
+      answers: ["Союзники", "Соревновательный", "Эскалация"],
+      correct: 1
+    },
+    {
+      question: "Какой из этих ножей есть в игре?",
+      answers: ["Karambit", "Butterfly", "Flip Knife"],
+      correct: 0
+    },
+    {
+      question: "Какой пистолет есть в игре?",
+      answers: ["Desert Eagle", "Glock", "Makarov"],
+      correct: 0
+    },
+    {
+      question: "Какой дробовик есть в игре?",
+      answers: ["SPAS", "M870", "XM1014"],
+      correct: 1
+    },
+    {
+      question: "Какой цвет легендарного скина?",
+      answers: ["Фиолетовый", "Жёлтый", "Оранжевый"],
+      correct: 2
+    },
+    {
+      question: "Какой режим похож на CS:GO?",
+      answers: ["Закладка бомбы", "Королевская битва", "Выживание"],
+      correct: 0
+    },
+    {
+      question: "Сколько стоит боевой пропуск?",
+      answers: ["100g", "120g", "150g"],
+      correct: 2
+    },
+    {
+      question: "Где можно торговать скинами?",
+      answers: ["Маркет", "Склад", "Профиль"],
+      correct: 0
+    },
+    {
+      question: "Какая винтовка есть в игре?",
+      answers: ["M40", "AWP", "R700"],
+      correct: 0
+    },
+    {
+      question: "Что нужно для обмена скинами?",
+      answers: ["Золото", "Друг", "Кейсы"],
+      correct: 1
+    },
+    {
+      question: "Какой уровень максимальный?",
+      answers: ["70", "99", "100"],
+      correct: 1
+    },
+    {
+      question: "Как зовут разработчика?",
+      answers: ["AXLEBOLT", "VALVE", "GARENA"],
+      correct: 0
+    },
+    {
+      question: "Какой популярный ютубер по игре?",
+      answers: ["Мэйсон", "Аид", "Фрост"],
+      correct: 0
+    },
+    {
+      question: "Какой нож самый дорогой?",
+      answers: ["Karambit Gold", "Butterfly", "Flip Knife"],
+      correct: 0
+    },
+    {
+      question: "Сколько кейсов можно открыть за раз?",
+      answers: ["1", "2", "3"],
+      correct: 0
+    },
+    {
+      question: "Какой режим есть в игре?",
+      answers: ["Бой насмерть", "Песочница", "Приключение"],
+      correct: 0
+    }
   ];
 
   let currentQuestion = 0;
-  let timeLeft = 60;
-  const timer = document.getElementById("timer");
-  const quiz = document.getElementById("quiz");
+  let score = 0;
+  let timer;
+  let timeLeft = 10;
+
+  const questionEl = document.getElementById("question");
+  const answersEl = document.getElementById("answers");
+  const timerEl = document.getElementById("timer");
+  const resultEl = document.getElementById("result");
+
+  function startQuiz() {
+    currentQuestion = 0;
+    score = 0;
+    showQuestion();
+  }
 
   function showQuestion() {
-    const q = quizData[currentQuestion];
-    quiz.innerHTML = `<div class="question">
-      <div class="question-title">${q.q}</div>
-      <div class="answers">
-        ${q.a.map((ans, i) => `<button onclick="checkAnswer(${i})">${ans}</button>`).join('')}
-      </div>
-    </div>`;
-  }
-
-  function checkAnswer(index) {
-    const buttons = document.querySelectorAll(".answers button");
-    buttons.forEach(btn => btn.disabled = true);
-    const correctIndex = quizData[currentQuestion].correct;
-    buttons[correctIndex].classList.add("correct");
-    if (index !== correctIndex) {
-      buttons[index].classList.add("incorrect");
-    }
-    setTimeout(() => {
-      currentQuestion++;
-      if (currentQuestion < quizData.length) {
-        showQuestion();
-      } else {
-        quiz.innerHTML = '<h2>Викторина завершена!</h2>';
-      }
-    }, 2000);
-  }
-
-  function startTimer() {
-    const interval = setInterval(() => {
-      timeLeft--;
-      timer.textContent = `Осталось времени: ${timeLeft} секунд`;
-      if (timeLeft <= 0) {
-        clearInterval(interval);
-        quiz.innerHTML = '<h2>Время вышло!</h2>';
-      }
-    }, 1000);
-  }
-
-  showQuestion();
-  startTimer();
-</script> <p> 
+    clearInterval(timer);
+    timeLeft =
+::contentReference[oaicite:12]{index=12}
+    <p>
+ 
 
 
   
