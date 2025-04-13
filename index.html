@@ -122,192 +122,169 @@ QGX9RM6Z1Q — 10000 голды
 <p class="moving-text">
   Всю информацию про буст беру из тгк ters chennel
 </p>
-<p> id="quiz-container" style="
-  font-size: 20px;
-  font-family: sans-serif;
-  font-weight: bold;
-  padding: 20px;
-  border-radius: 10px;
-  background: black;
-  color: white;
-  text-align: center;
-  transition: all 0.5s ease;
-"></<p>
-<p></p>
-<script>
-const container = document.getElementById("quiz-container");
+<p>
+  <style>
+    .rainbow {
+      background: linear-gradient(270deg, red, orange, yellow, green, blue, indigo, violet);
+      background-size: 1400% 1400%;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      animation: rainbow 5s linear infinite;
+    }
+    @keyframes rainbow {
+      0% {background-position: 0% 50%;}
+      100% {background-position: 100% 50%;}
+    }
+    .answer {
+      display: block;
+      margin: 10px auto;
+      padding: 10px;
+      background-color: #222;
+      color: white;
+      border-radius: 10px;
+      cursor: pointer;
+      width: 60%;
+      transition: all 0.3s ease;
+    }
+    .answer:hover {
+      background-color: #444;
+    }
+    .correct {
+      background-color: green !important;
+    }
+    .wrong {
+      background-color: red !important;
+    }
+  </style>
+  <div id="quiz" style="font-size: 20px; font-family: sans-serif; font-weight: bold; padding: 20px; border-radius: 10px; background: black; color: white; text-align: center;">
+    <div id="question" class="rainbow">Загрузка вопроса...</div>
+    <div id="answers"></div>
+    <div id="timer" style="margin-top: 10px;">Осталось времени: 10 секунд</div>
+    <div id="score" style="margin-top: 20px;"></div>
+  </div>
 
-const questions = [
-  {
-    question: "В каком году вышла игра Standoff 2?",
-    answers: ["2016", "2017", "2018", "2015"],
-    correct: 1
-  },
-  {
-    question: "Кем разработана игра Standoff 2?",
-    answers: ["Activision", "Valve", "Axlebolt", "Epic Games"],
-    correct: 2
-  },
-  {
-    question: "Какая карта есть в Standoff 2?",
-    answers: ["Dust 2", "Sandstone", "Inferno", "Mirage"],
-    correct: 1
-  },
-  {
-    question: "Сколько игроков максимум в одной команде?",
-    answers: ["3", "4", "5", "6"],
-    correct: 2
-  },
-  {
-    question: "Какой режим игры отсутствует?",
-    answers: ["Командный бой", "Бой насмерть", "Зомби режим", "Закладка бомбы"],
-    correct: 2
-  },
-  {
-    question: "Что такое 'frag' в игре?",
-    answers: ["Урон", "Убийство", "Граната", "Персонаж"],
-    correct: 1
-  },
-  {
-    question: "Какой нож есть в Standoff 2?",
-    answers: ["Karambit", "Bayonet", "Butterfly", "Все варианты"],
-    correct: 3
-  },
-  {
-    question: "Можно ли обменивать скины в игре?",
-    answers: ["Да", "Нет", "Только за золото", "Только в магазине"],
-    correct: 0
-  },
-  {
-    question: "Что такое 'рейтинговый матч'?",
-    answers: ["Игра с ботами", "Матч без очков", "Матч за очки и звания", "Матч с друзьями"],
-    correct: 2
-  },
-  {
-    question: "Как называется валюта в игре?",
-    answers: ["Голды", "Коины", "Баксы", "Рубли"],
-    correct: 0
-  },
-  {
-    question: "Что выпадает из кейсов?",
-    answers: ["Кейсы", "Скины", "Бусты", "Золото"],
-    correct: 1
-  },
-  {
-    question: "Как называется зимняя карта?",
-    answers: ["Winterland", "Snowfall", "Icecity", "Frosty"],
-    correct: 1
-  },
-  {
-    question: "Какой скин самый редкий?",
-    answers: ["Common", "Legendary", "Epic", "Arcade"],
-    correct: 1
-  },
-  {
-    question: "Что даёт повышение ранга?",
-    answers: ["Награды", "Звания", "Скины", "Кейсы"],
-    correct: 1
-  },
-  {
-    question: "Как называется автомат в игре?",
-    answers: ["AKR", "M4A1", "MP5", "Glock"],
-    correct: 0
-  },
-  {
-    question: "Какой снайпер есть в игре?",
-    answers: ["AWM", "Scout", "VSS", "Barrett"],
-    correct: 0
-  },
-  {
-    question: "Что такое MVP?",
-    answers: ["Мини-граната", "Лучший игрок", "Новый режим", "Карта"],
-    correct: 1
-  },
-  {
-    question: "Что такое 'разминка'?",
-    answers: ["Настройка игры", "Первые 30 сек", "Режим обучения", "Пауза"],
-    correct: 1
-  },
-  {
-    question: "Можно ли кастомизировать HUD?",
-    answers: ["Нет", "Да", "Только кнопки", "Только карту"],
-    correct: 1
-  },
-  {
-    question: "Как получить скин бесплатно?",
-    answers: ["Покупка", "Купить кейс", "Обмен или дроп", "Нельзя"],
-    correct: 2
-  },
-];
+  <script>
+    const quizData = [
+      {
+        question: "Когда была выпущена игра Standoff 2?",
+        answers: ["2016", "2017", "2018", "2019"],
+        correct: 1
+      },
+      {
+        question: "Какой режим НЕ представлен в Standoff 2?",
+        answers: ["Закладка бомбы", "Командный бой", "Заражение", "Гонки"],
+        correct: 3
+      },
+      {
+        question: "Какая валюта используется в игре?",
+        answers: ["Монеты", "Голда", "Кредиты", "Доллары"],
+        correct: 1
+      },
+      {
+        question: "Сколько игроков максимум в одной команде?",
+        answers: ["4", "5", "6", "7"],
+        correct: 1
+      },
+      {
+        question: "Какой популярный нож есть в Standoff 2?",
+        answers: ["Керамбит", "Катана", "Топор", "Мачете"],
+        correct: 0
+      },
+      {
+        question: "Какая карта присутствует в игре?",
+        answers: ["Dust 2", "Sandstone", "Mirage", "Inferno"],
+        correct: 1
+      },
+      {
+        question: "Какой ранг идёт после 'Gold 4'?",
+        answers: ["Platinum 1", "Master", "Elite", "Silver"],
+        correct: 2
+      },
+      {
+        question: "В каком магазине можно купить скины?",
+        answers: ["Steam", "Epic Games", "Маркет", "Промо-коды"],
+        correct: 2
+      },
+      {
+        question: "Какая сторона есть в игре?",
+        answers: ["Спецназ", "Пираты", "Зомби", "Рыцари"],
+        correct: 0
+      },
+      {
+        question: "Standoff 2 — это игра в жанре:",
+        answers: ["Головоломка", "Шутер от первого лица", "Квест", "Гонки"],
+        correct: 1
+      }
+    ];
 
-let current = 0;
-let score = 0;
-let timer;
-let timeLeft = 10;
+    let current = 0;
+    let score = 0;
+    let timer;
+    const timeLimit = 10;
 
-function showQuestion() {
-  if (current >= questions.length) {
-    container.innerHTML = `<p style="font-size:24px; color:lime;">Вы ответили правильно на ${score} из ${questions.length}</p>`;
-    return;
-  }
+    const questionEl = document.getElementById("question");
+    const answersEl = document.getElementById("answers");
+    const timerEl = document.getElementById("timer");
+    const scoreEl = document.getElementById("score");
 
-  let q = questions[current];
-  container.innerHTML = `<div style="animation: rgbText 5s infinite;">${q.question}</div><br>`;
-  q.answers.forEach((ans, i) => {
-    container.innerHTML += `<button style="margin:5px; padding:10px; background:#222; color:white; border:none; border-radius:5px; cursor:pointer; transition:0.3s;" onclick="selectAnswer(${i})">${ans}</button><br>`;
-  });
-  container.innerHTML += `<p id="timer" style="margin-top:10px;">Осталось времени: ${timeLeft} секунд</p>`;
+    function loadQuestion() {
+      if (current >= quizData.length) {
+        questionEl.innerHTML = "Викторина завершена!";
+        answersEl.innerHTML = "";
+        timerEl.innerHTML = "";
+        scoreEl.innerHTML = `Правильных ответов: ${score} из ${quizData.length}`;
+        return;
+      }
 
-  timeLeft = 10;
-  timer = setInterval(() => {
-    timeLeft--;
-    document.getElementById("timer").textContent = `Осталось времени: ${timeLeft} секунд`;
-    if (timeLeft === 0) {
+      const q = quizData[current];
+      questionEl.innerHTML = q.question;
+      answersEl.innerHTML = "";
+      let timeLeft = timeLimit;
+
+      timerEl.innerHTML = `Осталось времени: ${timeLeft} секунд`;
       clearInterval(timer);
-      showCorrect(null);
+      timer = setInterval(() => {
+        timeLeft--;
+        timerEl.innerHTML = `Осталось времени: ${timeLeft} секунд`;
+        if (timeLeft <= 0) {
+          clearInterval(timer);
+          showCorrectAnswer(-1);
+        }
+      }, 1000);
+
+      q.answers.forEach((ans, idx) => {
+        const btn = document.createElement("div");
+        btn.className = "answer";
+        btn.innerText = ans;
+        btn.onclick = () => {
+          clearInterval(timer);
+          showCorrectAnswer(idx);
+        };
+        answersEl.appendChild(btn);
+      });
     }
-  }, 1000);
-}
 
-function selectAnswer(i) {
-  clearInterval(timer);
-  showCorrect(i);
-}
-
-function showCorrect(selected) {
-  let buttons = container.querySelectorAll("button");
-  buttons.forEach((btn, i) => {
-    if (i === questions[current].correct) {
-      btn.style.background = "green";
-    } else if (i === selected) {
-      btn.style.background = "red";
-    } else {
-      btn.style.opacity = "0.5";
+    function showCorrectAnswer(selected) {
+      const q = quizData[current];
+      const children = answersEl.children;
+      for (let i = 0; i < children.length; i++) {
+        if (i === q.correct) {
+          children[i].classList.add("correct");
+        } else if (i === selected) {
+          children[i].classList.add("wrong");
+        }
+      }
+      if (selected === q.correct) score++;
+      setTimeout(() => {
+        current++;
+        loadQuestion();
+      }, 1500);
     }
-    btn.disabled = true;
-  });
 
-  if (selected === questions[current].correct) score++;
+    loadQuestion();
+  </script>
+</p>
 
-  setTimeout(() => {
-    current++;
-    showQuestion();
-  }, 2000);
-}
-
-showQuestion();
-</script>
-
-<style>
-@keyframes rgbText {
-  0% { color: red; }
-  25% { color: orange; }
-  50% { color: yellow; }
-  75% { color: cyan; }
-  100% { color: red; }
-}
-</style>
-  <p>
  
 
 
