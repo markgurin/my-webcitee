@@ -335,146 +335,113 @@ QGX9RM6Z1Q — 10000 голды
 </p>
 <p>
   <style>
-    .casino-container {
-      text-align: center;
-      margin-top: 20px;
-    }
-
-    .wheel {
-      width: 200px;
-      height: 200px;
-      border: 10px solid #fff;
-      border-radius: 50%;
-      margin: 0 auto;
+    #wheel-container {
       position: relative;
-      animation: glow 2s infinite alternate;
-      background: conic-gradient(
-        red 0deg 90deg,
-        yellow 90deg 180deg,
-        green 180deg 270deg,
-        blue 270deg 360deg
-      );
+      width: 300px;
+      height: 300px;
+      margin: 20px auto;
     }
 
-    .pointer {
-      width: 0;
-      height: 0;
-      border-left: 20px solid transparent;
-      border-right: 20px solid transparent;
-      border-bottom: 30px solid white;
-      position: absolute;
-      top: -30px;
-      left: 80px;
+    #wheel {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      border: 10px solid #fff;
+      box-shadow: 0 0 30px rgba(255, 255, 255, 0.2);
+      background: conic-gradient(red 0deg 60deg, green 60deg 90deg, red 90deg 360deg);
+      transition: transform 4s ease-out;
     }
 
-    .spin {
-      animation: spin 3s cubic-bezier(0.33, 1, 0.68, 1);
+    #spin-btn {
+      display: block;
+      margin: 20px auto;
+      padding: 10px 20px;
+      font-size: 20px;
+      font-weight: bold;
+      background: linear-gradient(45deg, red, green, blue);
+      -webkit-background-clip: text;
+      color: transparent;
+      border: 2px solid white;
+      border-radius: 10px;
+      cursor: pointer;
     }
 
-    @keyframes spin {
-      from { transform: rotate(0deg); }
-      to { transform: rotate(1080deg); }
-    }
-
-    @keyframes glow {
-      from { box-shadow: 0 0 10px #0f0; }
-      to { box-shadow: 0 0 20px #0ff; }
-    }
-
-    .rgb-text {
+    #result {
+      text-align: center;
       font-size: 24px;
       font-weight: bold;
-      background: linear-gradient(45deg, red, orange, yellow, green, cyan, blue, violet);
-      background-size: 400% 400%;
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      animation: rgbGlow 5s infinite linear;
-    }
-
-    @keyframes rgbGlow {
-      0% { background-position: 0% 50%; }
-      50% { background-position: 100% 50%; }
-      100% { background-position: 0% 50%; }
-    }
-
-    .message {
       margin-top: 20px;
-      font-size: 22px;
     }
 
-    .win-effect, .lose-effect {
+    .win,
+    .lose {
       position: fixed;
-      top: 50%;
+      top: 40%;
       left: 50%;
       transform: translate(-50%, -50%);
-      font-size: 64px;
+      font-size: 50px;
       font-weight: bold;
-      color: white;
-      display: none;
-      animation: fadeInOut 3s ease-in-out;
-      z-index: 999;
+      animation: fade 3s ease-out forwards;
+      z-index: 9999;
     }
 
-    .win-effect { color: lime; }
-    .lose-effect { color: red; }
+    .win {
+      color: lime;
+    }
 
-    @keyframes fadeInOut {
-      0% { opacity: 0; transform: translate(-50%, -50%) scale(0.8); }
-      10% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
-      90% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
-      100% { opacity: 0; transform: translate(-50%, -50%) scale(1.2); }
+    .lose {
+      color: red;
+    }
+
+    @keyframes fade {
+      0% { opacity: 0; transform: translate(-50%, -50%) scale(0.5); }
+      20% { opacity: 1; transform: translate(-50%, -50%) scale(1.2); }
+      100% { opacity: 0; transform: translate(-50%, -50%) scale(1); }
     }
   </style>
 
-  <div class="casino-container">
-    <div class="wheel" id="wheel">
-      <div class="pointer"></div>
-    </div>
-    <br>
-    <button onclick="spinWheel()">Сыграть</button>
-    <div class="message" id="message"></div>
+  <div id="wheel-container">
+    <div id="wheel"></div>
   </div>
+  <button id="spin-btn">Сыграть</button>
+  <div id="result"></div>
 
-  <div class="win-effect" id="winEffect">WIN</div>
-  <div class="lose-effect" id="loseEffect">LOSER</div>
-
-  <audio id="winSound" src="https://www.soundjay.com/misc/sounds/bell-ringing-05.mp3"></audio>
-  <audio id="loseSound" src="https://www.soundjay.com/button/sounds/button-10.mp3"></audio>
+  <audio id="spin-sound" src="https://cdn.pixabay.com/audio/2022/03/15/audio_72b421d9b6.mp3"></audio>
 
   <script>
-    function spinWheel() {
-      const wheel = document.getElementById("wheel");
-      const msg = document.getElementById("message");
-      const winEffect = document.getElementById("winEffect");
-      const loseEffect = document.getElementById("loseEffect");
-      const winSound = document.getElementById("winSound");
-      const loseSound = document.getElementById("loseSound");
+    const wheel = document.getElementById('wheel');
+    const result = document.getElementById('result');
+    const spinBtn = document.getElementById('spin-btn');
+    const spinSound = document.getElementById('spin-sound');
 
-      msg.innerHTML = "";
-      winEffect.style.display = "none";
-      loseEffect.style.display = "none";
+    spinBtn.onclick = () => {
+      result.innerHTML = '';
+      spinSound.currentTime = 0;
+      spinSound.play();
 
-      wheel.classList.remove("spin");
-      void wheel.offsetWidth; // restart animation
-      wheel.classList.add("spin");
+      const winChance = Math.random();
+      const angle = 3600 + Math.floor(Math.random() * 360);
+      const isWin = winChance < 0.3;
+
+      const finalAngle = isWin
+        ? angle + 75 // зелёный сектор
+        : angle + 20; // красный сектор
+
+      wheel.style.transform = `rotate(${finalAngle}deg)`;
 
       setTimeout(() => {
-        const chance = Math.random();
-        if (chance < 0.3) {
-          msg.innerHTML = '<span class="rgb-text">Привет!! Ты угадал число! Напиши мне в Standoff2 id 219167739</span>';
-          winEffect.style.display = "block";
-          winSound.play();
-          setTimeout(() => winEffect.style.display = "none", 3000);
-        } else {
-          msg.innerHTML = '<span style="color: red;">Ты не угадал, попробуй ещё раз!</span>';
-          loseEffect.style.display = "block";
-          loseSound.play();
-          setTimeout(() => loseEffect.style.display = "none", 3000);
-        }
-      }, 3100); // после вращения
-    }
+        const text = document.createElement('div');
+        text.className = isWin ? 'win' : 'lose';
+        text.textContent = isWin
+          ? 'WIN\nпривет!! ты угодал число напиши мне в standoff2 id 219167739'
+          : 'LOSER\nТЫ НЕ УГОДАЛ ПОПРОБУЙ ЕЩЕ РАЗ';
+        document.body.appendChild(text);
+        setTimeout(() => text.remove(), 3000);
+      }, 4000);
+    };
   </script>
 </p>
+
 
 
 
