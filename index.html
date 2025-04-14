@@ -335,118 +335,119 @@ QGX9RM6Z1Q — 10000 голды
 </p>
 <p>
   <style>
-    .casino {
-      font-size: 20px;
-      font-family: sans-serif;
+    .casino-container {
+      text-align: center;
+      margin-top: 20px;
+    }
+
+    .roulette {
+      font-size: 32px;
       font-weight: bold;
-      background: black;
       color: white;
       padding: 20px;
-      border-radius: 10px;
-      text-align: center;
-      animation: pulse 2s infinite;
-      position: relative;
-      z-index: 1;
+      background: #111;
+      border-radius: 12px;
+      display: inline-block;
+      min-width: 300px;
+      animation: glow 2s infinite alternate;
     }
 
-    @keyframes pulse {
-      0% { text-shadow: 0 0 5px red; color: red; }
-      25% { text-shadow: 0 0 5px orange; color: orange; }
-      50% { text-shadow: 0 0 5px green; color: green; }
-      75% { text-shadow: 0 0 5px blue; color: blue; }
-      100% { text-shadow: 0 0 5px violet; color: violet; }
+    .rgb-text {
+      background: linear-gradient(45deg, red, orange, yellow, green, cyan, blue, violet);
+      background-size: 400% 400%;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      animation: rgbGlow 5s infinite linear;
     }
 
-    .casino-button {
-      margin-top: 10px;
-      padding: 10px 20px;
-      font-size: 18px;
+    @keyframes rgbGlow {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    @keyframes glow {
+      from { box-shadow: 0 0 10px #0f0; }
+      to { box-shadow: 0 0 20px #0ff; }
+    }
+
+    .message {
+      font-size: 26px;
+      margin-top: 20px;
+      display: none;
+    }
+
+    .win-effect, .lose-effect {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 64px;
       font-weight: bold;
-      cursor: pointer;
-      border: none;
-      border-radius: 10px;
-      background: linear-gradient(to right, red, blue, green);
       color: white;
-      transition: transform 0.3s;
+      display: none;
+      animation: fadeInOut 3s ease-in-out;
+      z-index: 999;
     }
 
-    .casino-button:hover {
-      transform: scale(1.1);
-    }
-
-    .casino-result {
-      margin-top: 15px;
-      font-size: 18px;
-    }
-
-    .win {
+    .win-effect {
       color: lime;
     }
 
-    .lose {
+    .lose-effect {
       color: red;
     }
 
-    .overlay {
-      position: fixed;
-      top: 0; left: 0;
-      width: 100vw;
-      height: 100vh;
-      background: rgba(0, 0, 0, 0.85);
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      color: white;
-      font-size: 60px;
-      font-weight: bold;
-      z-index: 9999;
-      opacity: 0;
-      animation: fadeInOut 3s forwards;
-      pointer-events: none;
-    }
-
     @keyframes fadeInOut {
-      0%   { opacity: 0; transform: scale(0.8); }
-      20%  { opacity: 1; transform: scale(1); }
-      80%  { opacity: 1; transform: scale(1); }
-      100% { opacity: 0; transform: scale(0.8); }
+      0% { opacity: 0; transform: translate(-50%, -50%) scale(0.8); }
+      10% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+      90% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+      100% { opacity: 0; transform: translate(-50%, -50%) scale(1.2); }
     }
   </style>
 
-  <div class="casino" id="casino">
-    <div>🎰 Нажми кнопку, чтобы сыграть в мини-казино!</div>
-    <button class="casino-button" onclick="spinCasino()">Играть</button>
-    <div class="casino-result" id="result"></div>
-    <audio id="winSound" src="https://www.soundjay.com/human/sounds/applause-8.mp3" preload="auto"></audio>
-    <audio id="loseSound" src="https://www.soundjay.com/button/sounds/beep-10.mp3" preload="auto"></audio>
-    <div id="overlay" class="overlay"></div>
+  <div class="casino-container">
+    <div class="roulette rgb-text" id="roulette">🎰 Казино 🎰</div><br><br>
+    <button onclick="spinRoulette()">Сыграть</button>
+    <div class="message" id="message"></div>
   </div>
 
+  <div class="win-effect" id="winEffect">WIN</div>
+  <div class="lose-effect" id="loseEffect">LOSER</div>
+
+  <audio id="winSound" src="https://www.soundjay.com/misc/sounds/bell-ringing-05.mp3"></audio>
+  <audio id="loseSound" src="https://www.soundjay.com/button/sounds/button-10.mp3"></audio>
+
   <script>
-    function spinCasino() {
-      const result = document.getElementById("result");
-      const winSound = document.getElementById("winSound");
-      const loseSound = document.getElementById("loseSound");
-      const overlay = document.getElementById("overlay");
+    function spinRoulette() {
+      const msg = document.getElementById('message');
+      const winEffect = document.getElementById('winEffect');
+      const loseEffect = document.getElementById('loseEffect');
+      const winSound = document.getElementById('winSound');
+      const loseSound = document.getElementById('loseSound');
 
-      const random = Math.random();
-      if (random < 0.25) {
-        result.innerHTML = "<span class='win'>привет!! ты угодал число напиши мне в standoff2 id 219167739)</span>";
-        winSound.play();
-        showOverlay("WIN");
-      } else {
-        result.innerHTML = "<span class='lose'>ТЫ НЕ УГОДАЛ ПОПРОБУЙ ЕЩЕ РАЗ</span>";
-        loseSound.play();
-        showOverlay("LOSER");
-      }
-    }
+      msg.style.display = 'none';
 
-    function showOverlay(text) {
-      const overlay = document.getElementById("overlay");
-      overlay.innerText = text;
-      overlay.style.animation = "none";
-      void overlay.offsetWidth; // перезапуск анимации
-      overlay.style.animation = "fadeInOut 3s forwards";
+      const roulette = document.getElementById('roulette');
+      roulette.textContent = 'Крутим... 🎲';
+
+      setTimeout(() => {
+        const chance = Math.random();
+        if (chance < 0.3) {
+          roulette.textContent = '🎉 Победа! 🎉';
+          msg.innerHTML = '<span class="rgb-text">Привет!! Ты угадал число! Напиши мне в Standoff2 id 219167739</span>';
+          winEffect.style.display = 'block';
+          winSound.play();
+          setTimeout(() => winEffect.style.display = 'none', 3000);
+        } else {
+          roulette.textContent = '😢 Проигрыш';
+          msg.innerHTML = '<span style="color: red;">Ты не угадал, попробуй ещё раз!</span>';
+          loseEffect.style.display = 'block';
+          loseSound.play();
+          setTimeout(() => loseEffect.style.display = 'none', 3000);
+        }
+        msg.style.display = 'block';
+      }, 2000);
     }
   </script>
 </p>
