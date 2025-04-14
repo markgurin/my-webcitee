@@ -333,6 +333,123 @@ QGX9RM6Z1Q — 10000 голды
     }
   </script>
 </p>
+<p>
+  <style>
+    .casino {
+      font-size: 20px;
+      font-family: sans-serif;
+      font-weight: bold;
+      background: black;
+      color: white;
+      padding: 20px;
+      border-radius: 10px;
+      text-align: center;
+      animation: pulse 2s infinite;
+      position: relative;
+      z-index: 1;
+    }
+
+    @keyframes pulse {
+      0% { text-shadow: 0 0 5px red; color: red; }
+      25% { text-shadow: 0 0 5px orange; color: orange; }
+      50% { text-shadow: 0 0 5px green; color: green; }
+      75% { text-shadow: 0 0 5px blue; color: blue; }
+      100% { text-shadow: 0 0 5px violet; color: violet; }
+    }
+
+    .casino-button {
+      margin-top: 10px;
+      padding: 10px 20px;
+      font-size: 18px;
+      font-weight: bold;
+      cursor: pointer;
+      border: none;
+      border-radius: 10px;
+      background: linear-gradient(to right, red, blue, green);
+      color: white;
+      transition: transform 0.3s;
+    }
+
+    .casino-button:hover {
+      transform: scale(1.1);
+    }
+
+    .casino-result {
+      margin-top: 15px;
+      font-size: 18px;
+    }
+
+    .win {
+      color: lime;
+    }
+
+    .lose {
+      color: red;
+    }
+
+    .overlay {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(0, 0, 0, 0.85);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      color: white;
+      font-size: 60px;
+      font-weight: bold;
+      z-index: 9999;
+      opacity: 0;
+      animation: fadeInOut 3s forwards;
+      pointer-events: none;
+    }
+
+    @keyframes fadeInOut {
+      0%   { opacity: 0; transform: scale(0.8); }
+      20%  { opacity: 1; transform: scale(1); }
+      80%  { opacity: 1; transform: scale(1); }
+      100% { opacity: 0; transform: scale(0.8); }
+    }
+  </style>
+
+  <div class="casino" id="casino">
+    <div>🎰 Нажми кнопку, чтобы сыграть в мини-казино!</div>
+    <button class="casino-button" onclick="spinCasino()">Играть</button>
+    <div class="casino-result" id="result"></div>
+    <audio id="winSound" src="https://www.soundjay.com/human/sounds/applause-8.mp3" preload="auto"></audio>
+    <audio id="loseSound" src="https://www.soundjay.com/button/sounds/beep-10.mp3" preload="auto"></audio>
+    <div id="overlay" class="overlay"></div>
+  </div>
+
+  <script>
+    function spinCasino() {
+      const result = document.getElementById("result");
+      const winSound = document.getElementById("winSound");
+      const loseSound = document.getElementById("loseSound");
+      const overlay = document.getElementById("overlay");
+
+      const random = Math.random();
+      if (random < 0.25) {
+        result.innerHTML = "<span class='win'>привет!! ты угодал число напиши мне в standoff2 id 219167739)</span>";
+        winSound.play();
+        showOverlay("WIN");
+      } else {
+        result.innerHTML = "<span class='lose'>ТЫ НЕ УГОДАЛ ПОПРОБУЙ ЕЩЕ РАЗ</span>";
+        loseSound.play();
+        showOverlay("LOSER");
+      }
+    }
+
+    function showOverlay(text) {
+      const overlay = document.getElementById("overlay");
+      overlay.innerText = text;
+      overlay.style.animation = "none";
+      void overlay.offsetWidth; // перезапуск анимации
+      overlay.style.animation = "fadeInOut 3s forwards";
+    }
+  </script>
+</p>
 
 
 
