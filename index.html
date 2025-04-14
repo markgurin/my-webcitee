@@ -340,19 +340,50 @@ QGX9RM6Z1Q — 10000 голды
       margin-top: 20px;
     }
 
-    .roulette {
-      font-size: 32px;
-      font-weight: bold;
-      color: white;
-      padding: 20px;
-      background: #111;
-      border-radius: 12px;
-      display: inline-block;
-      min-width: 300px;
+    .wheel {
+      width: 200px;
+      height: 200px;
+      border: 10px solid #fff;
+      border-radius: 50%;
+      margin: 0 auto;
+      position: relative;
       animation: glow 2s infinite alternate;
+      background: conic-gradient(
+        red 0deg 90deg,
+        yellow 90deg 180deg,
+        green 180deg 270deg,
+        blue 270deg 360deg
+      );
+    }
+
+    .pointer {
+      width: 0;
+      height: 0;
+      border-left: 20px solid transparent;
+      border-right: 20px solid transparent;
+      border-bottom: 30px solid white;
+      position: absolute;
+      top: -30px;
+      left: 80px;
+    }
+
+    .spin {
+      animation: spin 3s cubic-bezier(0.33, 1, 0.68, 1);
+    }
+
+    @keyframes spin {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(1080deg); }
+    }
+
+    @keyframes glow {
+      from { box-shadow: 0 0 10px #0f0; }
+      to { box-shadow: 0 0 20px #0ff; }
     }
 
     .rgb-text {
+      font-size: 24px;
+      font-weight: bold;
       background: linear-gradient(45deg, red, orange, yellow, green, cyan, blue, violet);
       background-size: 400% 400%;
       -webkit-background-clip: text;
@@ -366,15 +397,9 @@ QGX9RM6Z1Q — 10000 голды
       100% { background-position: 0% 50%; }
     }
 
-    @keyframes glow {
-      from { box-shadow: 0 0 10px #0f0; }
-      to { box-shadow: 0 0 20px #0ff; }
-    }
-
     .message {
-      font-size: 26px;
       margin-top: 20px;
-      display: none;
+      font-size: 22px;
     }
 
     .win-effect, .lose-effect {
@@ -390,13 +415,8 @@ QGX9RM6Z1Q — 10000 голды
       z-index: 999;
     }
 
-    .win-effect {
-      color: lime;
-    }
-
-    .lose-effect {
-      color: red;
-    }
+    .win-effect { color: lime; }
+    .lose-effect { color: red; }
 
     @keyframes fadeInOut {
       0% { opacity: 0; transform: translate(-50%, -50%) scale(0.8); }
@@ -407,8 +427,11 @@ QGX9RM6Z1Q — 10000 голды
   </style>
 
   <div class="casino-container">
-    <div class="roulette rgb-text" id="roulette">🎰 Казино 🎰</div><br><br>
-    <button onclick="spinRoulette()">Сыграть</button>
+    <div class="wheel" id="wheel">
+      <div class="pointer"></div>
+    </div>
+    <br>
+    <button onclick="spinWheel()">Сыграть</button>
     <div class="message" id="message"></div>
   </div>
 
@@ -419,35 +442,36 @@ QGX9RM6Z1Q — 10000 голды
   <audio id="loseSound" src="https://www.soundjay.com/button/sounds/button-10.mp3"></audio>
 
   <script>
-    function spinRoulette() {
-      const msg = document.getElementById('message');
-      const winEffect = document.getElementById('winEffect');
-      const loseEffect = document.getElementById('loseEffect');
-      const winSound = document.getElementById('winSound');
-      const loseSound = document.getElementById('loseSound');
+    function spinWheel() {
+      const wheel = document.getElementById("wheel");
+      const msg = document.getElementById("message");
+      const winEffect = document.getElementById("winEffect");
+      const loseEffect = document.getElementById("loseEffect");
+      const winSound = document.getElementById("winSound");
+      const loseSound = document.getElementById("loseSound");
 
-      msg.style.display = 'none';
+      msg.innerHTML = "";
+      winEffect.style.display = "none";
+      loseEffect.style.display = "none";
 
-      const roulette = document.getElementById('roulette');
-      roulette.textContent = 'Крутим... 🎲';
+      wheel.classList.remove("spin");
+      void wheel.offsetWidth; // restart animation
+      wheel.classList.add("spin");
 
       setTimeout(() => {
         const chance = Math.random();
         if (chance < 0.3) {
-          roulette.textContent = '🎉 Победа! 🎉';
           msg.innerHTML = '<span class="rgb-text">Привет!! Ты угадал число! Напиши мне в Standoff2 id 219167739</span>';
-          winEffect.style.display = 'block';
+          winEffect.style.display = "block";
           winSound.play();
-          setTimeout(() => winEffect.style.display = 'none', 3000);
+          setTimeout(() => winEffect.style.display = "none", 3000);
         } else {
-          roulette.textContent = '😢 Проигрыш';
           msg.innerHTML = '<span style="color: red;">Ты не угадал, попробуй ещё раз!</span>';
-          loseEffect.style.display = 'block';
+          loseEffect.style.display = "block";
           loseSound.play();
-          setTimeout(() => loseEffect.style.display = 'none', 3000);
+          setTimeout(() => loseEffect.style.display = "none", 3000);
         }
-        msg.style.display = 'block';
-      }, 2000);
+      }, 3100); // после вращения
     }
   </script>
 </p>
