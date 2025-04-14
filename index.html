@@ -354,7 +354,7 @@ QGX9RM6Z1Q — 10000 голды
         #ff3c3c 180deg 360deg  /* LOSE */
       );
       position: relative;
-      transition: transform 5s cubic-bezier(0.25, 0.1, 0.25, 1);
+      transition: none;
     }
 
     .wheel-label {
@@ -432,6 +432,10 @@ QGX9RM6Z1Q — 10000 голды
       50% { opacity: 1; transform: scale(1.3); }
       100% { opacity: 0; transform: scale(1); }
     }
+
+    .spinning {
+      transition: transform 5s cubic-bezier(0.25, 0.1, 0.25, 1);
+    }
   </style>
 
   <div id="wheel-container">
@@ -453,30 +457,43 @@ QGX9RM6Z1Q — 10000 голды
     const resultMsg = document.getElementById('result-msg');
     const spinSound = document.getElementById('spin-sound');
 
+    let isSpinning = false;
+
     spinBtn.onclick = () => {
+      if (isSpinning) return;
+      isSpinning = true;
       resultMsg.textContent = '';
       spinSound.currentTime = 0;
       spinSound.play();
 
-      const isWin = Math.random() < 0.1; // 10% шанс
-      const baseAngle = 3600;
-      const angle = isWin
-        ? 135 + Math.floor(Math.random() * 30) // WIN сектор
-        : Math.random() < 0.5
-          ? 30 + Math.floor(Math.random() * 90)   // LOSE сектор 1
-          : 200 + Math.floor(Math.random() * 140); // LOSE сектор 2
-
-      const totalAngle = baseAngle + angle;
-
-      wheel.style.transform = `rotate(${totalAngle}deg)`;
+      // Удалим прошлую анимацию, чтобы она сбросилась
+      wheel.classList.remove('spinning');
+      wheel.style.transform = `rotate(0deg)`;
 
       setTimeout(() => {
-        if (isWin) {
-          resultMsg.innerHTML = `<div class="win-msg">🎉 Привет! Ты угадал число!<br>Напиши мне в Standoff2: ID 219167739</div>`;
-        } else {
-          resultMsg.innerHTML = `<div class="lose-msg">😢 Ты не угадал. Попробуй ещё раз!</div>`;
-        }
-      }, 5000);
+        const isWin = Math.random() < 0.1; // 10% шанс выигрыша
+        const baseAngle = 3600; // минимум 10 полных оборотов
+        const extraAngle = isWin
+          ? 135 + Math.floor(Math.random() * 30) // WIN сектор
+          : Math.random() < 0.5
+            ? 30 + Math.floor(Math.random() * 90)   // LOSE сектор 1
+            : 200 + Math.floor(Math.random() * 140); // LOSE сектор 2
+
+        const finalAngle = baseAngle + extraAngle;
+
+        // Включаем плавную анимацию и вращаем
+        wheel.classList.add('spinning');
+        wheel.style.transform = `rotate(${finalAngle}deg)`;
+
+        setTimeout(() => {
+          if (isWin) {
+            resultMsg.innerHTML = `<div class="win-msg">🎉 Привет! Ты угадал число!<br>Напиши мне в Standoff2: ID 219167739</div>`;
+          } else {
+            resultMsg.innerHTML = `<div class="lose-msg">😢 Ты не угадал. Попробуй ещё раз!</div>`;
+          }
+          isSpinning = false;
+        }, 5000);
+      }, 50); // Нужно время чтобы сброс transform
     };
   </script>
 </p>
