@@ -346,10 +346,47 @@ QGX9RM6Z1Q — 10000 голды
       width: 100%;
       height: 100%;
       border-radius: 50%;
-      border: 10px solid #fff;
-      box-shadow: 0 0 30px rgba(255, 255, 255, 0.2);
-      background: conic-gradient(red 0deg 60deg, green 60deg 90deg, red 90deg 360deg);
-      transition: transform 4s ease-out;
+      border: 8px solid #fff;
+      box-shadow: 0 0 30px rgba(255, 255, 255, 0.3);
+      background: conic-gradient(
+        #ff4444 0deg 90deg, /* LOSE */
+        #44ff44 90deg 126deg, /* WIN */
+        #ff4444 126deg 360deg /* LOSE */
+      );
+      transition: transform 5s ease-out;
+      position: relative;
+    }
+
+    .wheel-label {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 28px;
+      font-weight: bold;
+      color: white;
+      pointer-events: none;
+    }
+
+    .label-win {
+      transform: rotate(108deg) translateY(-120px);
+      color: lime;
+      font-size: 24px;
+    }
+
+    .label-lose1 {
+      transform: rotate(45deg) translateY(-120px);
+      color: red;
+      font-size: 24px;
+    }
+
+    .label-lose2 {
+      transform: rotate(270deg) translateY(-120px);
+      color: red;
+      font-size: 24px;
     }
 
     #spin-btn {
@@ -401,7 +438,11 @@ QGX9RM6Z1Q — 10000 голды
   </style>
 
   <div id="wheel-container">
-    <div id="wheel"></div>
+    <div id="wheel">
+      <div class="wheel-label label-win">WIN</div>
+      <div class="wheel-label label-lose1">LOSE</div>
+      <div class="wheel-label label-lose2">LOSE</div>
+    </div>
   </div>
   <button id="spin-btn">Сыграть</button>
   <div id="result"></div>
@@ -420,14 +461,18 @@ QGX9RM6Z1Q — 10000 голды
       spinSound.play();
 
       const winChance = Math.random();
-      const angle = 3600 + Math.floor(Math.random() * 360);
-      const isWin = winChance < 0.3;
+      const isWin = winChance < 0.1; // 10% шанс
 
-      const finalAngle = isWin
-        ? angle + 75 // зелёный сектор
-        : angle + 20; // красный сектор
+      const baseAngle = 3600;
+      const extraAngle = isWin
+        ? 90 + Math.floor(Math.random() * 30) // WIN сектор (90-120)
+        : Math.random() < 0.5
+          ? 20 + Math.floor(Math.random() * 50)  // LOSE 1 (0–90)
+          : 220 + Math.floor(Math.random() * 120); // LOSE 2 (126–360)
 
-      wheel.style.transform = `rotate(${finalAngle}deg)`;
+      const totalAngle = baseAngle + extraAngle;
+
+      wheel.style.transform = `rotate(${totalAngle}deg)`;
 
       setTimeout(() => {
         const text = document.createElement('div');
@@ -437,10 +482,11 @@ QGX9RM6Z1Q — 10000 голды
           : 'LOSER\nТЫ НЕ УГОДАЛ ПОПРОБУЙ ЕЩЕ РАЗ';
         document.body.appendChild(text);
         setTimeout(() => text.remove(), 3000);
-      }, 4000);
+      }, 5000);
     };
   </script>
 </p>
+
 
 
 
