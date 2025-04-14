@@ -122,168 +122,7 @@ QGX9RM6Z1Q — 10000 голды
 <p class="moving-text">
   Всю информацию про буст беру из тгк ters chennel
 </p>
-<p>
-  <style>
-    .rainbow {
-      background: linear-gradient(270deg, red, orange, yellow, green, blue, indigo, violet);
-      background-size: 1400% 1400%;
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      animation: rainbow 5s linear infinite;
-    }
-    @keyframes rainbow {
-      0% {background-position: 0% 50%;}
-      100% {background-position: 100% 50%;}
-    }
-    .answer {
-      display: block;
-      margin: 10px auto;
-      padding: 10px;
-      background-color: #222;
-      color: white;
-      border-radius: 10px;
-      cursor: pointer;
-      width: 60%;
-      transition: all 0.3s ease;
-    }
-    .answer:hover {
-      background-color: #444;
-    }
-    .correct {
-      background-color: green !important;
-    }
-    .wrong {
-      background-color: red !important;
-    }
-  </style>
-  <div id="quiz" style="font-size: 20px; font-family: sans-serif; font-weight: bold; padding: 20px; border-radius: 10px; background: black; color: white; text-align: center;">
-    <div id="question" class="rainbow">Загрузка вопроса...</div>
-    <div id="answers"></div>
-    <div id="timer" style="margin-top: 10px;">Осталось времени: 10 секунд</div>
-    <div id="score" style="margin-top: 20px;"></div>
-  </div>
 
-  <script>
-    const quizData = [
-      {
-        question: "Когда была выпущена игра Standoff 2?",
-        answers: ["2016", "2017", "2018", "2019"],
-        correct: 1
-      },
-      {
-        question: "Какой режим НЕ представлен в Standoff 2?",
-        answers: ["Закладка бомбы", "Командный бой", "Заражение", "Гонки"],
-        correct: 3
-      },
-      {
-        question: "Какая валюта используется в игре?",
-        answers: ["Монеты", "Голда", "Кредиты", "Доллары"],
-        correct: 1
-      },
-      {
-        question: "Сколько игроков максимум в одной команде?",
-        answers: ["4", "5", "6", "7"],
-        correct: 1
-      },
-      {
-        question: "Какой популярный нож есть в Standoff 2?",
-        answers: ["Керамбит", "Катана", "Топор", "Мачете"],
-        correct: 0
-      },
-      {
-        question: "Какая карта присутствует в игре?",
-        answers: ["Dust 2", "Sandstone", "Mirage", "Inferno"],
-        correct: 1
-      },
-      {
-        question: "Какой ранг идёт после 'Gold 4'?",
-        answers: ["Platinum 1", "Master", "Elite", "Silver"],
-        correct: 2
-      },
-      {
-        question: "В каком магазине можно купить скины?",
-        answers: ["Steam", "Epic Games", "Маркет", "Промо-коды"],
-        correct: 2
-      },
-      {
-        question: "Какая сторона есть в игре?",
-        answers: ["Спецназ", "Пираты", "Зомби", "Рыцари"],
-        correct: 0
-      },
-      {
-        question: "Standoff 2 — это игра в жанре:",
-        answers: ["Головоломка", "Шутер от первого лица", "Квест", "Гонки"],
-        correct: 1
-      }
-    ];
-
-    let current = 0;
-    let score = 0;
-    let timer;
-    const timeLimit = 10;
-
-    const questionEl = document.getElementById("question");
-    const answersEl = document.getElementById("answers");
-    const timerEl = document.getElementById("timer");
-    const scoreEl = document.getElementById("score");
-
-    function loadQuestion() {
-      if (current >= quizData.length) {
-        questionEl.innerHTML = "Викторина завершена!";
-        answersEl.innerHTML = "";
-        timerEl.innerHTML = "";
-        scoreEl.innerHTML = `Правильных ответов: ${score} из ${quizData.length}`;
-        return;
-      }
-
-      const q = quizData[current];
-      questionEl.innerHTML = q.question;
-      answersEl.innerHTML = "";
-      let timeLeft = timeLimit;
-
-      timerEl.innerHTML = `Осталось времени: ${timeLeft} секунд`;
-      clearInterval(timer);
-      timer = setInterval(() => {
-        timeLeft--;
-        timerEl.innerHTML = `Осталось времени: ${timeLeft} секунд`;
-        if (timeLeft <= 0) {
-          clearInterval(timer);
-          showCorrectAnswer(-1);
-        }
-      }, 1000);
-
-      q.answers.forEach((ans, idx) => {
-        const btn = document.createElement("div");
-        btn.className = "answer";
-        btn.innerText = ans;
-        btn.onclick = () => {
-          clearInterval(timer);
-          showCorrectAnswer(idx);
-        };
-        answersEl.appendChild(btn);
-      });
-    }
-
-    function showCorrectAnswer(selected) {
-      const q = quizData[current];
-      const children = answersEl.children;
-      for (let i = 0; i < children.length; i++) {
-        if (i === q.correct) {
-          children[i].classList.add("correct");
-        } else if (i === selected) {
-          children[i].classList.add("wrong");
-        }
-      }
-      if (selected === q.correct) score++;
-      setTimeout(() => {
-        current++;
-        loadQuestion();
-      }, 1500);
-    }
-
-    loadQuestion();
-  </script>
-</p>
 
  <!DOCTYPE html>
 <html lang="ru">
@@ -461,6 +300,40 @@ QGX9RM6Z1Q — 10000 голды
   </script>
 </body>
 </html>
+  <p>
+  <div id="guess-game" style="text-align:center; font-size: 20px; font-family: sans-serif; color: white;">
+    <h2 id="rgb-title" style="font-weight: bold;">Угадай число от 1 до 1000</h2>
+    <input type="number" id="userInput" min="1" max="1000" style="padding:10px; font-size:16px; border-radius:5px;">
+    <button onclick="checkGuess()" style="padding:10px 20px; font-size:16px; border:none; border-radius:5px; background:#444; color:white; cursor:pointer;">Проверить</button>
+    <p id="result" style="margin-top:15px; font-size: 18px;"></p>
+  </div>
+
+  <script>
+    const secretNumber = 123;
+    const title = document.getElementById("rgb-title");
+
+    // RGB-анимация текста
+    let hue = 0;
+    setInterval(() => {
+      title.style.color = `hsl(${hue}, 100%, 50%)`;
+      hue = (hue + 2) % 360;
+    }, 50);
+
+    function checkGuess() {
+      const input = document.getElementById("userInput").value;
+      const result = document.getElementById("result");
+      
+      if (parseInt(input) === secretNumber) {
+        result.style.color = "lime";
+        result.innerHTML = "Привет!! Ты угадал число. Напиши мне в Standoff 2, ID: 219167739";
+      } else {
+        result.style.color = "red";
+        result.innerHTML = "ТЫ НЕ УГАДАЛ! ПОПРОБУЙ ЕЩЁ РАЗ.";
+      }
+    }
+  </script>
+</p>
+
 
 
 
