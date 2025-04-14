@@ -346,15 +346,15 @@ QGX9RM6Z1Q — 10000 голды
       width: 100%;
       height: 100%;
       border-radius: 50%;
-      border: 8px solid #fff;
-      box-shadow: 0 0 30px rgba(255, 255, 255, 0.3);
+      border: 6px solid #fff;
+      box-shadow: 0 0 30px rgba(255, 255, 255, 0.2);
       background: conic-gradient(
-        #ff4444 0deg 90deg, /* LOSE */
-        #44ff44 90deg 126deg, /* WIN */
-        #ff4444 126deg 360deg /* LOSE */
+        #ff3c3c 0deg 135deg,   /* LOSE */
+        #3cff3c 135deg 180deg, /* WIN */
+        #ff3c3c 180deg 360deg  /* LOSE */
       );
-      transition: transform 5s ease-out;
       position: relative;
+      transition: transform 5s cubic-bezier(0.25, 0.1, 0.25, 1);
     }
 
     .wheel-label {
@@ -362,126 +362,120 @@ QGX9RM6Z1Q — 10000 голды
       width: 100%;
       height: 100%;
       border-radius: 50%;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      font-size: 28px;
+      font-size: 22px;
       font-weight: bold;
       color: white;
+      text-shadow: 1px 1px 3px black;
       pointer-events: none;
     }
 
     .label-win {
-      transform: rotate(108deg) translateY(-120px);
-      color: lime;
-      font-size: 24px;
+      transform: rotate(158deg) translateY(-120px);
+      color: #00ff00;
     }
 
     .label-lose1 {
-      transform: rotate(45deg) translateY(-120px);
+      transform: rotate(60deg) translateY(-120px);
       color: red;
-      font-size: 24px;
     }
 
     .label-lose2 {
       transform: rotate(270deg) translateY(-120px);
       color: red;
-      font-size: 24px;
     }
 
     #spin-btn {
       display: block;
       margin: 20px auto;
-      padding: 10px 20px;
+      padding: 12px 24px;
       font-size: 20px;
       font-weight: bold;
+      border: 2px solid white;
+      border-radius: 10px;
       background: linear-gradient(45deg, red, green, blue);
       -webkit-background-clip: text;
       color: transparent;
-      border: 2px solid white;
-      border-radius: 10px;
       cursor: pointer;
     }
 
-    #result {
-      text-align: center;
-      font-size: 24px;
-      font-weight: bold;
-      margin-top: 20px;
-    }
-
-    .win,
-    .lose {
-      position: fixed;
-      top: 40%;
+    #pointer {
+      width: 0;
+      height: 0;
+      border-left: 15px solid transparent;
+      border-right: 15px solid transparent;
+      border-bottom: 20px solid white;
+      position: absolute;
+      top: -20px;
       left: 50%;
-      transform: translate(-50%, -50%);
-      font-size: 50px;
+      transform: translateX(-50%);
+    }
+
+    #result-msg {
+      text-align: center;
+      font-size: 26px;
       font-weight: bold;
-      animation: fade 3s ease-out forwards;
-      z-index: 9999;
+      margin-top: 15px;
     }
 
-    .win {
+    .win-msg {
       color: lime;
+      animation: fadeZoom 3s ease-out;
     }
 
-    .lose {
+    .lose-msg {
       color: red;
+      animation: fadeZoom 3s ease-out;
     }
 
-    @keyframes fade {
-      0% { opacity: 0; transform: translate(-50%, -50%) scale(0.5); }
-      20% { opacity: 1; transform: translate(-50%, -50%) scale(1.2); }
-      100% { opacity: 0; transform: translate(-50%, -50%) scale(1); }
+    @keyframes fadeZoom {
+      0% { opacity: 0; transform: scale(0.5); }
+      50% { opacity: 1; transform: scale(1.3); }
+      100% { opacity: 0; transform: scale(1); }
     }
   </style>
 
   <div id="wheel-container">
+    <div id="pointer"></div>
     <div id="wheel">
-      <div class="wheel-label label-win">WIN</div>
       <div class="wheel-label label-lose1">LOSE</div>
+      <div class="wheel-label label-win">WIN</div>
       <div class="wheel-label label-lose2">LOSE</div>
     </div>
   </div>
   <button id="spin-btn">Сыграть</button>
-  <div id="result"></div>
+  <div id="result-msg"></div>
 
   <audio id="spin-sound" src="https://cdn.pixabay.com/audio/2022/03/15/audio_72b421d9b6.mp3"></audio>
 
   <script>
     const wheel = document.getElementById('wheel');
-    const result = document.getElementById('result');
     const spinBtn = document.getElementById('spin-btn');
+    const resultMsg = document.getElementById('result-msg');
     const spinSound = document.getElementById('spin-sound');
 
     spinBtn.onclick = () => {
-      result.innerHTML = '';
+      resultMsg.textContent = '';
       spinSound.currentTime = 0;
       spinSound.play();
 
-      const winChance = Math.random();
-      const isWin = winChance < 0.1; // 10% шанс
-
+      const isWin = Math.random() < 0.1; // 10% шанс
       const baseAngle = 3600;
-      const extraAngle = isWin
-        ? 90 + Math.floor(Math.random() * 30) // WIN сектор (90-120)
+      const angle = isWin
+        ? 135 + Math.floor(Math.random() * 30) // WIN сектор
         : Math.random() < 0.5
-          ? 20 + Math.floor(Math.random() * 50)  // LOSE 1 (0–90)
-          : 220 + Math.floor(Math.random() * 120); // LOSE 2 (126–360)
+          ? 30 + Math.floor(Math.random() * 90)   // LOSE сектор 1
+          : 200 + Math.floor(Math.random() * 140); // LOSE сектор 2
 
-      const totalAngle = baseAngle + extraAngle;
+      const totalAngle = baseAngle + angle;
 
       wheel.style.transform = `rotate(${totalAngle}deg)`;
 
       setTimeout(() => {
-        const text = document.createElement('div');
-        text.className = isWin ? 'win' : 'lose';
-        text.textContent = isWin
-          ? 'WIN\nпривет!! ты угодал число напиши мне в standoff2 id 219167739'
-          : 'LOSER\nТЫ НЕ УГОДАЛ ПОПРОБУЙ ЕЩЕ РАЗ';
-        document.body.appendChild(text);
-        setTimeout(() => text.remove(), 3000);
+        if (isWin) {
+          resultMsg.innerHTML = `<div class="win-msg">🎉 Привет! Ты угадал число!<br>Напиши мне в Standoff2: ID 219167739</div>`;
+        } else {
+          resultMsg.innerHTML = `<div class="lose-msg">😢 Ты не угадал. Попробуй ещё раз!</div>`;
+        }
       }, 5000);
     };
   </script>
