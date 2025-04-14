@@ -335,168 +335,171 @@ QGX9RM6Z1Q — 10000 голды
 </p>
 <p>
   <style>
-    #wheel-container {
-      position: relative;
-      width: 300px;
-      height: 300px;
-      margin: 20px auto;
+    .slot-machine {
+      text-align: center;
+      font-family: sans-serif;
+      margin-top: 20px;
     }
 
-    #wheel {
-      width: 100%;
-      height: 100%;
-      border-radius: 50%;
-      border: 6px solid #fff;
-      box-shadow: 0 0 30px rgba(255, 255, 255, 0.2);
-      background: conic-gradient(
-        #ff3c3c 0deg 135deg,   /* LOSE */
-        #3cff3c 135deg 180deg, /* WIN */
-        #ff3c3c 180deg 360deg  /* LOSE */
-      );
-      position: relative;
-      transition: none;
+    .slots {
+      font-size: 48px;
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      margin-bottom: 20px;
     }
 
-    .wheel-label {
-      position: absolute;
-      width: 100%;
-      height: 100%;
-      border-radius: 50%;
+    .slot {
+      width: 60px;
+      height: 60px;
+      background: #111;
+      color: #fff;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      font-size: 40px;
+      box-shadow: 0 0 10px rgba(255, 255, 255, 0.4);
+    }
+
+    .rgb-text {
       font-size: 22px;
       font-weight: bold;
-      color: white;
-      text-shadow: 1px 1px 3px black;
-      pointer-events: none;
+      background: linear-gradient(90deg, red, orange, yellow, green, cyan, blue, violet);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      animation: rgb 3s linear infinite;
     }
 
-    .label-win {
-      transform: rotate(158deg) translateY(-120px);
-      color: #00ff00;
+    @keyframes rgb {
+      0% { background-position: 0% }
+      100% { background-position: 100% }
     }
 
-    .label-lose1 {
-      transform: rotate(60deg) translateY(-120px);
-      color: red;
-    }
-
-    .label-lose2 {
-      transform: rotate(270deg) translateY(-120px);
-      color: red;
-    }
-
-    #spin-btn {
-      display: block;
-      margin: 20px auto;
-      padding: 12px 24px;
+    .result {
       font-size: 20px;
       font-weight: bold;
-      border: 2px solid white;
-      border-radius: 10px;
-      background: linear-gradient(45deg, red, green, blue);
-      -webkit-background-clip: text;
-      color: transparent;
+      margin-top: 10px;
+    }
+
+    .win {
+      color: lime;
+    }
+
+    .lose {
+      color: red;
+    }
+
+    .spin-btn {
+      padding: 10px 20px;
+      font-size: 16px;
+      background: #333;
+      color: white;
+      border: none;
+      border-radius: 8px;
       cursor: pointer;
     }
 
-    #pointer {
-      width: 0;
-      height: 0;
-      border-left: 15px solid transparent;
-      border-right: 15px solid transparent;
-      border-bottom: 20px solid white;
-      position: absolute;
-      top: -20px;
+    .spin-btn:hover {
+      background: #555;
+    }
+
+    .fullscreen-message {
+      position: fixed;
+      top: 50%;
       left: 50%;
-      transform: translateX(-50%);
-    }
-
-    #result-msg {
-      text-align: center;
-      font-size: 26px;
+      transform: translate(-50%, -50%);
+      font-size: 64px;
       font-weight: bold;
-      margin-top: 15px;
+      z-index: 9999;
+      opacity: 0;
+      pointer-events: none;
+      animation: fadeScale 3s ease forwards;
     }
 
-    .win-msg {
+    .fullscreen-win {
       color: lime;
-      animation: fadeZoom 3s ease-out;
+      text-shadow: 0 0 20px lime;
     }
 
-    .lose-msg {
+    .fullscreen-lose {
       color: red;
-      animation: fadeZoom 3s ease-out;
+      text-shadow: 0 0 20px red;
     }
 
-    @keyframes fadeZoom {
-      0% { opacity: 0; transform: scale(0.5); }
-      50% { opacity: 1; transform: scale(1.3); }
-      100% { opacity: 0; transform: scale(1); }
-    }
-
-    .spinning {
-      transition: transform 5s cubic-bezier(0.25, 0.1, 0.25, 1);
+    @keyframes fadeScale {
+      0% { transform: translate(-50%, -50%) scale(0.5); opacity: 0; }
+      20% { opacity: 1; }
+      80% { opacity: 1; }
+      100% { transform: translate(-50%, -50%) scale(1.2); opacity: 0; }
     }
   </style>
 
-  <div id="wheel-container">
-    <div id="pointer"></div>
-    <div id="wheel">
-      <div class="wheel-label label-lose1">LOSE</div>
-      <div class="wheel-label label-win">WIN</div>
-      <div class="wheel-label label-lose2">LOSE</div>
+  <div class="slot-machine">
+    <div class="slots">
+      <div class="slot" id="slot1">7</div>
+      <div class="slot" id="slot2">7</div>
+      <div class="slot" id="slot3">7</div>
     </div>
+    <button class="spin-btn" onclick="spin()">Сыграть</button>
+    <div class="result" id="result"></div>
   </div>
-  <button id="spin-btn">Сыграть</button>
-  <div id="result-msg"></div>
 
-  <audio id="spin-sound" src="https://cdn.pixabay.com/audio/2022/03/15/audio_72b421d9b6.mp3"></audio>
+  <div id="fullscreenMessage"></div>
 
   <script>
-    const wheel = document.getElementById('wheel');
-    const spinBtn = document.getElementById('spin-btn');
-    const resultMsg = document.getElementById('result-msg');
-    const spinSound = document.getElementById('spin-sound');
+    const symbols = ['7', '🍒', '💎', '⭐', '🍋'];
 
-    let isSpinning = false;
-
-    spinBtn.onclick = () => {
-      if (isSpinning) return;
-      isSpinning = true;
-      resultMsg.textContent = '';
-      spinSound.currentTime = 0;
-      spinSound.play();
-
-      // Удалим прошлую анимацию, чтобы она сбросилась
-      wheel.classList.remove('spinning');
-      wheel.style.transform = `rotate(0deg)`;
-
+    function showFullscreenMessage(text, type) {
+      const msg = document.getElementById("fullscreenMessage");
+      msg.textContent = text;
+      msg.className = `fullscreen-message ${type}`;
       setTimeout(() => {
-        const isWin = Math.random() < 0.1; // 10% шанс выигрыша
-        const baseAngle = 3600; // минимум 10 полных оборотов
-        const extraAngle = isWin
-          ? 135 + Math.floor(Math.random() * 30) // WIN сектор
-          : Math.random() < 0.5
-            ? 30 + Math.floor(Math.random() * 90)   // LOSE сектор 1
-            : 200 + Math.floor(Math.random() * 140); // LOSE сектор 2
+        msg.className = ''; // убрать после 3 секунд
+        msg.textContent = '';
+      }, 3000);
+    }
 
-        const finalAngle = baseAngle + extraAngle;
+    function spin() {
+      const slot1 = document.getElementById("slot1");
+      const slot2 = document.getElementById("slot2");
+      const slot3 = document.getElementById("slot3");
+      const result = document.getElementById("result");
+      result.textContent = '';
+      result.className = 'result';
 
-        // Включаем плавную анимацию и вращаем
-        wheel.classList.add('spinning');
-        wheel.style.transform = `rotate(${finalAngle}deg)`;
+      let spins = 10;
+      let count = 0;
+      const interval = setInterval(() => {
+        slot1.textContent = symbols[Math.floor(Math.random() * symbols.length)];
+        slot2.textContent = symbols[Math.floor(Math.random() * symbols.length)];
+        slot3.textContent = symbols[Math.floor(Math.random() * symbols.length)];
+        count++;
+        if (count >= spins) {
+          clearInterval(interval);
 
-        setTimeout(() => {
-          if (isWin) {
-            resultMsg.innerHTML = `<div class="win-msg">🎉 Привет! Ты угадал число!<br>Напиши мне в Standoff2: ID 219167739</div>`;
+          const win = Math.random() < 0.1; // 10% шанс
+          if (win) {
+            slot1.textContent = '7';
+            slot2.textContent = '7';
+            slot3.textContent = '7';
+            result.innerHTML = '<span class="rgb-text win">ты выиграл — напиши мне в Standoff2 id 219167739</span>';
+            showFullscreenMessage("WIN", "fullscreen-win");
           } else {
-            resultMsg.innerHTML = `<div class="lose-msg">😢 Ты не угадал. Попробуй ещё раз!</div>`;
+            const getRandomSymbol = () => symbols[Math.floor(Math.random() * (symbols.length - 1)) + 1]; // без 7
+            slot1.textContent = getRandomSymbol();
+            slot2.textContent = getRandomSymbol();
+            slot3.textContent = getRandomSymbol();
+            result.innerHTML = '<span class="lose">ТЫ НЕ УГОДАЛ, ПОПРОБУЙ ЕЩЁ РАЗ</span>';
+            showFullscreenMessage("LOSER", "fullscreen-lose");
           }
-          isSpinning = false;
-        }, 5000);
-      }, 50); // Нужно время чтобы сброс transform
-    };
+        }
+      }, 100);
+    }
   </script>
 </p>
+
 
 
 
