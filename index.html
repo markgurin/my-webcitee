@@ -501,272 +501,144 @@ QGX9RM6Z1Q — 10000 голды
 </p>
 <p>
 <style>
-  .case-container {
-    width: 320px;
-    margin: 40px auto;
-    padding: 10px;
-    background: #111;
-    border: 2px solid #888;
-    border-radius: 12px;
-    text-align: center;
-    color: white;
-    font-family: sans-serif;
-    position: relative;
-  }
-  .skins-strip {
-    display: flex;
-    overflow: hidden;
-    height: 100px;
-    margin: 20px 0;
-    border: 2px solid #444;
-    border-radius: 8px;
-    background: #222;
-    position: relative;
-  }
-  .skin {
-    flex-shrink: 0;
-    width: 100px;
-    height: 100px;
-    line-height: 100px;
-    text-align: center;
-    background-size: cover;
-    font-weight: bold;
-    border: 2px solid #666;
-    color: #fff;
-  }
-  .rgb-text {
-    animation: rgb 2s infinite;
-    font-weight: bold;
-  }
-  @keyframes rgb {
-    0% { color: red; }
-    33% { color: lime; }
-    66% { color: blue; }
-    100% { color: red; }
-  }
-  .balance {
-    position: fixed;
-    top: 10px;
-    left: 10px;
-    background: #222;
-    border: 2px solid #888;
-    border-radius: 8px;
-    padding: 8px 14px;
-    font-size: 16px;
-    z-index: 999;
-  }
-</style>
-
-<div class="balance" id="balance">RGD: 0</div>
-
-<div class="case-container">
-  <div class="skins-strip" id="strip"></div>
-  <button onclick="openCase()">🎁 Открыть кейс (5 RGD)</button>
-  <div id="result" style="margin-top:15px;"></div>
-</div>
-
-<script>
-  const rarities = {
-    rare: { chance: 50, color: 'gray', skins: ["R-1", "R-2", "R-3", "R-4", "R-5"] },
-    mythical: { chance: 25, color: 'blue', skins: ["M-1", "M-2", "M-3", "M-4", "M-5"] },
-    legendary: { chance: 15, color: 'purple', skins: ["L-1", "L-2", "L-3", "L-4", "L-5"] },
-    arcana: { chance: 7, color: 'orange', skins: ["A-1", "A-2", "A-3", "A-4", "A-5"] },
-    nameless: { chance: 3, color: 'gold', skins: ["N-1", "N-2", "N-3", "N-4", "N-5"] },
-  };
-
-  let balance = parseInt(localStorage.getItem('rgdPoints') || "0");
-  const updateBalance = () => document.getElementById("balance").innerText = `RGD: ${balance}`;
-
-  function openCase() {
-    if (balance < 5) {
-      document.getElementById("result").innerHTML = "<span style='color:red'>Недостаточно RGD для открытия кейса</span>";
-      return;
-    }
-
-    balance -= 5;
-    localStorage.setItem('rgdPoints', balance);
-    updateBalance();
-
-    const strip = document.getElementById("strip");
-    strip.innerHTML = "";
-
-    const getRandomRarity = () => {
-      const roll = Math.random() * 100;
-      let sum = 0;
-      for (const [rarity, data] of Object.entries(rarities)) {
-        sum += data.chance;
-        if (roll < sum) return { rarity, ...data };
-      }
-      return { rarity: "rare", ...rarities.rare };
-    };
-
-    const stripSkins = [];
-    for (let i = 0; i < 20; i++) {
-      const { rarity, skins, color } = getRandomRarity();
-      const skin = skins[Math.floor(Math.random() * skins.length)];
-      stripSkins.push({ name: skin, color });
-    }
-
-    for (let i = 0; i < stripSkins.length; i++) {
-      const div = document.createElement("div");
-      div.className = "skin";
-      div.innerText = stripSkins[i].name;
-      div.style.background = stripSkins[i].color;
-      strip.appendChild(div);
-    }
-
-    let pos = 0;
-    let interval = setInterval(() => {
-      pos += 5;
-      strip.scrollLeft = pos;
-    }, 16);
-
-    setTimeout(() => {
-      clearInterval(interval);
-      const center = stripSkins[10];
-      document.getElementById("result").innerHTML =
-        `<div class="rgb-text">Выпал скин: ${center.name}</div>`;
-    }, 3000);
-  }
-
-  updateBalance();
-</script>
-</p>
-<p>
-<style>
-  #pointsDisplay {
-    position: fixed;
-    top: 10px;
-    left: 10px;
-    background: linear-gradient(90deg, red, green, blue);
-    color: white;
-    padding: 10px 20px;
-    font-size: 20px;
-    font-weight: bold;
-    border-radius: 10px;
-    box-shadow: 0 0 15px rgba(255,255,255,0.7);
-    z-index: 9999;
-  }
-  .point-animation {
-    position: fixed;
-    top: 50px;
-    left: 20px;
-    font-size: 20px;
-    font-weight: bold;
-    color: lime;
-    animation: floatUp 1s ease-out;
-    z-index: 9999;
-  }
-  @keyframes floatUp {
-    0% { opacity: 1; transform: translateY(0); }
-    100% { opacity: 0; transform: translateY(-40px); }
-  }
-</style>
-
-<div id="pointsDisplay">RGD: <span id="points">0</span></div>
-<div id="pointsAnimationContainer"></div>
-
-<script>
-  let points = parseInt(localStorage.getItem("rgdPoints")) || 0;
-  const pointsDisplay = document.getElementById("points");
-  const animationContainer = document.getElementById("pointsAnimationContainer");
-
-  function updatePointsDisplay() {
-    pointsDisplay.textContent = points;
-    localStorage.setItem("rgdPoints", points);
-  }
-
-  function addPoints(amount) {
-    points += amount;
-    updatePointsDisplay();
-    playSound();
-    animatePoints("+" + amount);
-  }
-
-  function animatePoints(text) {
-    const anim = document.createElement("div");
-    anim.className = "point-animation";
-    anim.textContent = text;
-    animationContainer.appendChild(anim);
-    setTimeout(() => anim.remove(), 1000);
-  }
-
-  function playSound() {
-    const audio = new Audio("https://cdn.pixabay.com/download/audio/2022/03/15/audio_89d3835c36.mp3?filename=correct-answer-2-37956.mp3");
-    audio.volume = 0.5;
-    audio.play();
-  }
-
-  updatePointsDisplay();
-
-  // Пример добавления очков (замени на вызов в своих играх)
-  // addPoints(1); // казино
-  // addPoints(5); // викторина
-  // addPoints(10); // угадай число
-</script>
-</p>
-
-<p>
-<style>
-  #rgd-display {
-    position: fixed;
-    top: 10px;
-    left: 10px;
-    background: black;
-    color: white;
-    padding: 10px;
-    border: 2px solid #0ff;
-    font-family: monospace;
-    font-size: 18px;
-    z-index: 9999;
-    border-radius: 8px;
-  }
-
   .rgb-text {
     font-weight: bold;
-    background: linear-gradient(90deg, red, orange, yellow, green, cyan, blue, violet);
+    font-size: 20px;
+    background: linear-gradient(270deg, red, orange, yellow, green, cyan, blue, violet);
+    background-size: 1400% 1400%;
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
-    animation: rgbMove 3s linear infinite;
+    animation: rainbow 10s ease infinite;
   }
 
-  @keyframes rgbMove {
-    0% { background-position: 0% }
-    100% { background-position: 100% }
+  @keyframes rainbow {
+    0% {background-position: 0% 50%;}
+    50% {background-position: 100% 50%;}
+    100% {background-position: 0% 50%;}
   }
 
-  .click-btn {
-    margin-top: 100px;
+  .rgd-counter {
+    position: fixed;
+    top: 10px;
+    left: 10px;
+    padding: 10px;
+    background: black;
+    color: lime;
+    font-weight: bold;
+    border-radius: 10px;
+    z-index: 9999;
+    font-family: monospace;
+  }
+
+  .case-button {
     padding: 10px 20px;
-    font-size: 20px;
+    background: gold;
+    color: black;
+    border: none;
+    border-radius: 10px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: transform 0.3s;
+  }
+
+  .case-button:hover {
+    transform: scale(1.05);
+  }
+
+  .drop-animation {
+    margin-top: 20px;
+    width: 300px;
+    height: 100px;
+    border: 2px solid #fff;
+    overflow: hidden;
+    position: relative;
     background: #111;
     color: white;
-    border: 2px solid #0ff;
-    cursor: pointer;
-    border-radius: 8px;
+    font-family: sans-serif;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .drop-item {
+    position: absolute;
+    white-space: nowrap;
+    animation: scrollDrop 4s linear forwards;
+  }
+
+  @keyframes scrollDrop {
+    0% { left: 100%; }
+    100% { left: -100%; }
   }
 </style>
 
-<div id="rgd-display">RGD: 0</div>
-<button class="click-btn rgb-text" onclick="addRGD()">НАЖМИ СЮДА</button>
+<div class="rgd-counter" id="rgdCounter">RGD: 0</div>
+<button class="case-button" onclick="openCase()">Открыть кейс (5 RGD)</button>
+<div class="drop-animation" id="dropAnimation"></div>
 
 <script>
-  let rgd = localStorage.getItem("rgd") ? parseInt(localStorage.getItem("rgd")) : 0;
+let rgd = 0;
 
-  function updateRGD() {
-    document.getElementById("rgd-display").innerText = "RGD: " + rgd;
-    localStorage.setItem("rgd", rgd);
-  }
-
-  function addRGD() {
-    rgd += 1;
-    updateRGD();
-  }
-
+function addRGD(amount) {
+  rgd += amount;
   updateRGD();
+}
+
+function spendRGD(amount) {
+  if (rgd >= amount) {
+    rgd -= amount;
+    updateRGD();
+    return true;
+  } else {
+    alert("Недостаточно RGD!");
+    return false;
+  }
+}
+
+function updateRGD() {
+  document.getElementById("rgdCounter").innerText = `RGD: ${rgd}`;
+}
+
+const skins = {
+  "Рарка": ["Desert Eagle | Toxic", "AKR | Carbon", "UMP45 | Arctic", "M4 | Samurai", "Famas | Beagle"],
+  "Эпик": ["AWM | Dragon", "AKR | Skull", "M16 | Winged", "Desert Eagle | Great", "UMP45 | Cerberus"],
+  "Легендарка": ["AKR12 | Railgun", "M4 | Predator", "Famas | Fury", "Desert Eagle | Cyber", "UMP45 | Beast"],
+  "Аркана": ["Karambit | Universe", "Butterfly | Flame", "M9 Bayonet | Frost", "Flip Knife | Lightning", "Gut Knife | Royal"]
+};
+
+const chances = {
+  "Рарка": 50,
+  "Эпик": 30,
+  "Легендарка": 15,
+  "Аркана": 5
+};
+
+function getRandomSkin() {
+  const roll = Math.random() * 100;
+  let cumulative = 0;
+  for (const rarity in chances) {
+    cumulative += chances[rarity];
+    if (roll < cumulative) {
+      const items = skins[rarity];
+      const randomItem = items[Math.floor(Math.random() * items.length)];
+      return `${rarity} — ${randomItem}`;
+    }
+  }
+  return "Неизвестный скин";
+}
+
+function openCase() {
+  if (!spendRGD(5)) return;
+  const drop = getRandomSkin();
+  const dropDiv = document.getElementById("dropAnimation");
+  dropDiv.innerHTML = `<div class='drop-item rgb-text'>${drop}</div>`;
+  addRGD(0); // Очки за кейс не начисляются, можно изменить
+}
+
+// Пример: вручную начисляем RGD за другие мини-игры
+addRGD(10); // Можно вызывать из других игр
 </script>
 </p>
-
 
 
 
