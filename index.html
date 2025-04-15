@@ -499,6 +499,139 @@ QGX9RM6Z1Q — 10000 голды
     }
   </script>
 </p>
+<p>
+<style>
+  .case-container {
+    width: 320px;
+    margin: 40px auto;
+    padding: 10px;
+    background: #111;
+    border: 2px solid #888;
+    border-radius: 12px;
+    text-align: center;
+    color: white;
+    font-family: sans-serif;
+    position: relative;
+  }
+  .skins-strip {
+    display: flex;
+    overflow: hidden;
+    height: 100px;
+    margin: 20px 0;
+    border: 2px solid #444;
+    border-radius: 8px;
+    background: #222;
+    position: relative;
+  }
+  .skin {
+    flex-shrink: 0;
+    width: 100px;
+    height: 100px;
+    line-height: 100px;
+    text-align: center;
+    background-size: cover;
+    font-weight: bold;
+    border: 2px solid #666;
+    color: #fff;
+  }
+  .rgb-text {
+    animation: rgb 2s infinite;
+    font-weight: bold;
+  }
+  @keyframes rgb {
+    0% { color: red; }
+    33% { color: lime; }
+    66% { color: blue; }
+    100% { color: red; }
+  }
+  .balance {
+    position: fixed;
+    top: 10px;
+    left: 10px;
+    background: #222;
+    border: 2px solid #888;
+    border-radius: 8px;
+    padding: 8px 14px;
+    font-size: 16px;
+    z-index: 999;
+  }
+</style>
+
+<div class="balance" id="balance">RGD: 0</div>
+
+<div class="case-container">
+  <div class="skins-strip" id="strip"></div>
+  <button onclick="openCase()">🎁 Открыть кейс (5 RGD)</button>
+  <div id="result" style="margin-top:15px;"></div>
+</div>
+
+<script>
+  const rarities = {
+    rare: { chance: 50, color: 'gray', skins: ["R-1", "R-2", "R-3", "R-4", "R-5"] },
+    mythical: { chance: 25, color: 'blue', skins: ["M-1", "M-2", "M-3", "M-4", "M-5"] },
+    legendary: { chance: 15, color: 'purple', skins: ["L-1", "L-2", "L-3", "L-4", "L-5"] },
+    arcana: { chance: 7, color: 'orange', skins: ["A-1", "A-2", "A-3", "A-4", "A-5"] },
+    nameless: { chance: 3, color: 'gold', skins: ["N-1", "N-2", "N-3", "N-4", "N-5"] },
+  };
+
+  let balance = parseInt(localStorage.getItem('rgdPoints') || "0");
+  const updateBalance = () => document.getElementById("balance").innerText = `RGD: ${balance}`;
+
+  function openCase() {
+    if (balance < 5) {
+      document.getElementById("result").innerHTML = "<span style='color:red'>Недостаточно RGD для открытия кейса</span>";
+      return;
+    }
+
+    balance -= 5;
+    localStorage.setItem('rgdPoints', balance);
+    updateBalance();
+
+    const strip = document.getElementById("strip");
+    strip.innerHTML = "";
+
+    const getRandomRarity = () => {
+      const roll = Math.random() * 100;
+      let sum = 0;
+      for (const [rarity, data] of Object.entries(rarities)) {
+        sum += data.chance;
+        if (roll < sum) return { rarity, ...data };
+      }
+      return { rarity: "rare", ...rarities.rare };
+    };
+
+    const stripSkins = [];
+    for (let i = 0; i < 20; i++) {
+      const { rarity, skins, color } = getRandomRarity();
+      const skin = skins[Math.floor(Math.random() * skins.length)];
+      stripSkins.push({ name: skin, color });
+    }
+
+    for (let i = 0; i < stripSkins.length; i++) {
+      const div = document.createElement("div");
+      div.className = "skin";
+      div.innerText = stripSkins[i].name;
+      div.style.background = stripSkins[i].color;
+      strip.appendChild(div);
+    }
+
+    let pos = 0;
+    let interval = setInterval(() => {
+      pos += 5;
+      strip.scrollLeft = pos;
+    }, 16);
+
+    setTimeout(() => {
+      clearInterval(interval);
+      const center = stripSkins[10];
+      document.getElementById("result").innerHTML =
+        `<div class="rgb-text">Выпал скин: ${center.name}</div>`;
+    }, 3000);
+  }
+
+  updateBalance();
+</script>
+</p>
 
 
 
