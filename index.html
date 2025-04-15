@@ -499,144 +499,167 @@ QGX9RM6Z1Q — 10000 голды
     }
   </script>
 </p>
-<p>
-  <style>
-    @keyframes rgb {
-      0% { color: red; }
-      33% { color: lime; }
-      66% { color: blue; }
-      100% { color: red; }
-    }
-    .rgb-text {
-      animation: rgb 2s infinite;
-      font-weight: bold;
-    }
-    #rgd-counter {
-      position: fixed;
-      top: 10px;
-      left: 10px;
-      background: black;
-      color: lime;
-      padding: 10px;
-      border: 2px solid lime;
-      border-radius: 10px;
-      z-index: 9999;
-    }
-    #inventory {
-      display: none;
-      position: fixed;
-      top: 50px;
-      right: 10px;
-      background: #111;
-      color: white;
-      padding: 10px;
-      border: 2px solid white;
-      border-radius: 10px;
-      max-height: 400px;
-      overflow-y: auto;
-      z-index: 9999;
-    }
-    #inventory button {
-      background: red;
-      color: white;
-      border: none;
-      padding: 5px;
-      margin: 3px;
-      cursor: pointer;
-    }
-    .case-skin {
-      padding: 5px;
-      margin: 5px;
-      border: 1px solid #fff;
-      border-radius: 5px;
-    }
-  </style>
+<style>
+  body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: #0f0f0f;
+    color: white;
+    overflow-x: hidden;
+  }
+  .rgd-counter {
+    position: fixed;
+    top: 10px;
+    left: 10px;
+    padding: 8px 12px;
+    background: #222;
+    border: 2px solid #555;
+    border-radius: 10px;
+    font-size: 18px;
+    z-index: 999;
+  }
+  .case-container {
+    text-align: center;
+    padding: 20px;
+  }
+  .case-button {
+    padding: 15px 30px;
+    background: linear-gradient(45deg, red, blue, green);
+    border: none;
+    border-radius: 10px;
+    color: white;
+    font-size: 18px;
+    cursor: pointer;
+    margin-top: 20px;
+  }
+  .animation-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    pointer-events: none;
+    overflow: hidden;
+    z-index: 9999;
+  }
+  .win-text {
+    position: absolute;
+    color: green;
+    font-size: 24px;
+    animation: floatUp 3s linear forwards;
+  }
+  @keyframes floatUp {
+    0% { transform: translateY(0); opacity: 1; }
+    100% { transform: translateY(-100vh); opacity: 0; }
+  }
+  .skin-preview {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin: 20px 0;
+  }
+  .skin-item {
+    background: #1a1a1a;
+    padding: 10px;
+    border-radius: 10px;
+    width: 100px;
+    text-align: center;
+    color: white;
+  }
+  .skin-item img {
+    max-width: 100%;
+    border-radius: 5px;
+  }
+</style>
 
-  <div id="rgd-counter">RGD: 0</div>
-  <button onclick="openCase()">Открыть кейс (5 RGD)</button>
-  <button onclick="toggleInventory()">Инвентарь</button>
-  <div id="inventory"></div>
-  <div id="case-drop"></div>
+<div class="rgd-counter">RGD: <span id="rgd">0</span></div>
+<div class="case-container">
+  <h2>Список возможных скинов</h2>
+  <div class="skin-preview" id="skinPreview"></div>
+  <button class="case-button" onclick="openCase()">Открыть кейс (5 RGD)</button>
+</div>
+<div class="animation-container" id="winAnimation"></div>
+<audio id="winSound" src="https://www.myinstants.com/media/sounds/victory.mp3"></audio>
 
-  <script>
-    const skins = {
-      "Rare": ["Desert Eagle | Blaze", "AKR | Sport", "M4 | Samurai", "FAMAS | Beagle", "USP | Venom"],
-      "Epic": ["AKR | Carbon", "M4 | Necromancer", "AWM | Gear", "TEC-9 | Space", "UMP45 | Pixel"],
-      "Legendary": ["M4 | Grand Prix", "AKR12 | Mechanism", "AWM | Treasure Hunter", "FAMAS | Monster", "P350 | Forest Spirit"],
-      "Arcana": ["Karambit | Gold", "M9 | Bayonet Dragon Glass", "Butterfly | Legacy", "Flip Knife | Arctic", "AKR | Tag King"]
-    };
+<script>
+  const skins = [
+    { name: 'AKR Treasure', rarity: 'Аркана', image: 'https://example.com/akr-treasure.png' },
+    { name: 'M4 Frost', rarity: 'Легендарка', image: 'https://example.com/m4-frost.png' },
+    { name: 'Desert Eagle Flame', rarity: 'Эпик', image: 'https://example.com/deagle-flame.png' },
+    { name: 'UMP Shark', rarity: 'Рарка', image: 'https://example.com/ump-shark.png' }
+  ];
 
-    const dropRates = {
-      "Rare": 50,
-      "Epic": 30,
-      "Legendary": 15,
-      "Arcana": 5
-    };
+  const rarityWeights = {
+    'Аркана': 1,
+    'Легендарка': 4,
+    'Эпик': 10,
+    'Рарка': 85
+  };
 
-    const prices = {
-      "Rare": 3,
-      "Epic": 10,
-      "Legendary": 15,
-      "Arcana": 20
-    };
+  let rgd = 0;
+  const rgdDisplay = document.getElementById('rgd');
 
-    let rgd = 0;
-    let inventory = [];
+  function updateRGD(amount) {
+    rgd += amount;
+    rgdDisplay.textContent = rgd;
+  }
 
-    function updateRGD() {
-      document.getElementById("rgd-counter").innerText = `RGD: ${rgd}`;
+  function showSkinList() {
+    const container = document.getElementById('skinPreview');
+    container.innerHTML = '';
+    skins.forEach(skin => {
+      container.innerHTML += `
+        <div class="skin-item">
+          <img src="${skin.image}" alt="${skin.name}" />
+          <div>${skin.name}</div>
+          <small>${skin.rarity}</small>
+        </div>
+      `;
+    });
+  }
+
+  function openCase() {
+    if (rgd < 5) {
+      alert('Недостаточно RGD для открытия кейса!');
+      return;
     }
+    updateRGD(-5);
 
-    function getRandomRarity() {
-      const roll = Math.random() * 100;
-      let sum = 0;
-      for (let rarity in dropRates) {
-        sum += dropRates[rarity];
-        if (roll <= sum) return rarity;
+    const roll = Math.random() * 100;
+    let chosen;
+    let total = 0;
+    for (let skin of skins) {
+      total += rarityWeights[skin.rarity];
+      if (roll < total) {
+        chosen = skin;
+        break;
       }
     }
+    if (!chosen) chosen = skins[skins.length - 1];
 
-    function openCase() {
-      if (rgd < 5) {
-        alert("Недостаточно RGD для открытия кейса!");
-        return;
+    alert(`Выпал скин: ${chosen.name} (${chosen.rarity})`);
+
+    if (chosen.rarity === 'Аркана') {
+      const animationContainer = document.getElementById('winAnimation');
+      const sound = document.getElementById('winSound');
+      for (let i = 0; i < 100; i++) {
+        const span = document.createElement('span');
+        span.textContent = 'WIN';
+        span.className = 'win-text';
+        span.style.left = Math.random() * window.innerWidth + 'px';
+        span.style.top = Math.random() * window.innerHeight + 'px';
+        animationContainer.appendChild(span);
       }
-      rgd -= 5;
-      updateRGD();
-      const rarity = getRandomRarity();
-      const item = skins[rarity][Math.floor(Math.random() * skins[rarity].length)];
-      inventory.push({ name: item, rarity });
-      document.getElementById("case-drop").innerHTML = `<div class='rgb-text'>Выпал скин: ${item} (${rarity})</div>`;
-      showInventory();
+      sound.play();
+      setTimeout(() => {
+        animationContainer.innerHTML = '';
+      }, 3000);
     }
+  }
 
-    function toggleInventory() {
-      const inv = document.getElementById("inventory");
-      inv.style.display = inv.style.display === "none" ? "block" : "none";
-      showInventory();
-    }
-
-    function showInventory() {
-      const inv = document.getElementById("inventory");
-      inv.innerHTML = '<h3>Инвентарь</h3>';
-      inventory.forEach((skin, index) => {
-        inv.innerHTML += `<div class='case-skin'>${skin.name} (${skin.rarity}) <button onclick='sell(${index})'>Продать (${prices[skin.rarity]} RGD)</button></div>`;
-      });
-    }
-
-    function sell(index) {
-      const skin = inventory[index];
-      rgd += prices[skin.rarity];
-      inventory.splice(index, 1);
-      updateRGD();
-      showInventory();
-    }
-
-    // Изначально начислим немного RGD для теста
-    rgd = 10;
-    updateRGD();
-  </script>
-</p>
+  showSkinList();
+</script>
 
 
 
