@@ -706,6 +706,66 @@ QGX9RM6Z1Q — 10000 голды
 </script>
 </p>
 
+<p>
+<style>
+  #rgd-display {
+    position: fixed;
+    top: 10px;
+    left: 10px;
+    background: black;
+    color: white;
+    padding: 10px;
+    border: 2px solid #0ff;
+    font-family: monospace;
+    font-size: 18px;
+    z-index: 9999;
+    border-radius: 8px;
+  }
+
+  .rgb-text {
+    font-weight: bold;
+    background: linear-gradient(90deg, red, orange, yellow, green, cyan, blue, violet);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: rgbMove 3s linear infinite;
+  }
+
+  @keyframes rgbMove {
+    0% { background-position: 0% }
+    100% { background-position: 100% }
+  }
+
+  .click-btn {
+    margin-top: 100px;
+    padding: 10px 20px;
+    font-size: 20px;
+    background: #111;
+    color: white;
+    border: 2px solid #0ff;
+    cursor: pointer;
+    border-radius: 8px;
+  }
+</style>
+
+<div id="rgd-display">RGD: 0</div>
+<button class="click-btn rgb-text" onclick="addRGD()">НАЖМИ СЮДА</button>
+
+<script>
+  let rgd = localStorage.getItem("rgd") ? parseInt(localStorage.getItem("rgd")) : 0;
+
+  function updateRGD() {
+    document.getElementById("rgd-display").innerText = "RGD: " + rgd;
+    localStorage.setItem("rgd", rgd);
+  }
+
+  function addRGD() {
+    rgd += 1;
+    updateRGD();
+  }
+
+  updateRGD();
+</script>
+</p>
 
 
 
