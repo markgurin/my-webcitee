@@ -499,258 +499,243 @@ QGX9RM6Z1Q — 10000 голды
     }
   </script>
 </p>
+<!-- === СТИЛИ === -->
 <style>
   body {
     margin: 0;
     font-family: Arial, sans-serif;
-    background: #0f0f0f;
-    color: white;
     overflow-x: hidden;
   }
-  .rgd-counter {
+  .rainbow {
+    animation: rainbow 2s linear infinite;
+  }
+  @keyframes rainbow {
+    0% {color: red;}
+    16% {color: orange;}
+    33% {color: yellow;}
+    50% {color: green;}
+    66% {color: blue;}
+    83% {color: indigo;}
+    100% {color: violet;}
+  }
+  #rgdCounter {
     position: fixed;
     top: 10px;
     left: 10px;
-    padding: 8px 12px;
-    background: #222;
-    border: 2px solid #555;
-    border-radius: 10px;
-    font-size: 18px;
-    z-index: 999;
-  }
-  .case-container {
-    text-align: center;
-    padding: 20px;
-  }
-  .case-button {
-    padding: 15px 30px;
-    background: linear-gradient(45deg, red, blue, green);
-    border: none;
-    border-radius: 10px;
+    padding: 5px 15px;
+    background: black;
     color: white;
-    font-size: 18px;
-    cursor: pointer;
-    margin-top: 20px;
+    border-radius: 10px;
+    z-index: 9999;
+    font-weight: bold;
   }
-  .animation-container {
+  #promoButton {
     position: fixed;
-    top: 0;
-    left: 0;
-    width: 100vw;
-    height: 100vh;
-    pointer-events: none;
-    overflow: hidden;
+    top: 10px;
+    right: 10px;
+    padding: 8px 14px;
+    background: linear-gradient(45deg, red, orange, yellow, green, blue, indigo, violet);
+    color: white;
+    font-weight: bold;
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
     z-index: 9999;
   }
-  .win-text {
-    position: absolute;
-    color: green;
-    font-size: 24px;
-    animation: floatUp 3s linear forwards;
+  #promoPopup {
+    position: fixed;
+    top: 60px;
+    right: 10px;
+    background: #111;
+    padding: 15px;
+    border-radius: 10px;
+    color: white;
+    display: none;
+    z-index: 9999;
   }
-  @keyframes floatUp {
-    0% { transform: translateY(0); opacity: 1; }
-    100% { transform: translateY(-100vh); opacity: 0; }
+  #promoPopup input {
+    padding: 5px;
+    border-radius: 5px;
+    width: 150px;
   }
-  .skin-preview {
-    display: flex;
-    justify-content: center;
-    flex-wrap: wrap;
-    gap: 10px;
-    margin: 20px 0;
+  #caseOpenButton {
+    margin: 20px;
+    padding: 10px 20px;
+    font-size: 18px;
+    cursor: pointer;
+    background: gold;
+    border: none;
+    border-radius: 8px;
   }
-  .skin-item {
-    background: #1a1a1a;
+  #dropArea {
+    margin-top: 40px;
+    padding: 20px;
+    text-align: center;
+  }
+  .skin {
+    display: inline-block;
+    margin: 10px;
     padding: 10px;
     border-radius: 10px;
-    width: 100px;
-    text-align: center;
+    background: #222;
     color: white;
   }
-  .skin-item img {
-    max-width: 100%;
-    border-radius: 5px;
+  .inventoryBtn {
+    position: fixed;
+    bottom: 10px;
+    left: 10px;
+    padding: 8px 14px;
+    background: #555;
+    color: white;
+    border-radius: 8px;
+    cursor: pointer;
+    z-index: 9999;
+  }
+  #inventoryModal {
+    display: none;
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: rgba(0,0,0,0.8);
+    color: white;
+    padding: 20px;
+    z-index: 10000;
+    overflow-y: auto;
+  }
+  .sellBtn {
+    background: red;
+    color: white;
+    padding: 4px 8px;
+    border: none;
+    border-radius: 4px;
+    margin-top: 5px;
+    cursor: pointer;
   }
 </style>
 
-<div class="rgd-counter">RGD: <span id="rgd">0</span></div>
-<div class="case-container">
-  <h2>Список возможных скинов</h2>
-  <div class="skin-preview" id="skinPreview"></div>
-  <button class="case-button" onclick="openCase()">Открыть кейс (5 RGD)</button>
+<!-- === ЭЛЕМЕНТЫ UI === -->
+<div id="rgdCounter">0 RGD</div>
+<button id="promoButton">Promocode</button>
+<div id="promoPopup">
+  <input type="text" id="promoInput" placeholder="впиши промо" class="rainbow">
+  <button onclick="applyPromo()">OK</button>
 </div>
-<div class="animation-container" id="winAnimation"></div>
-<audio id="winSound" src="https://www.myinstants.com/media/sounds/victory.mp3"></audio>
+<button id="caseOpenButton">Открыть кейс (5 RGD)</button>
+<div id="dropArea"></div>
+<button class="inventoryBtn" onclick="toggleInventory()">Инвентарь</button>
+<div id="inventoryModal"><h2>Твой инвентарь:</h2><div id="inventoryContent"></div></div>
 
-<script>
-  const skins = [
-    { name: 'AKR Treasure', rarity: 'Аркана', image: 'https://example.com/akr-treasure.png' },
-    { name: 'M4 Frost', rarity: 'Легендарка', image: 'https://example.com/m4-frost.png' },
-    { name: 'Desert Eagle Flame', rarity: 'Эпик', image: 'https://example.com/deagle-flame.png' },
-    { name: 'UMP Shark', rarity: 'Рарка', image: 'https://example.com/ump-shark.png' }
-  ];
-
-  const rarityWeights = {
-    'Аркана': 1,
-    'Легендарка': 4,
-    'Эпик': 10,
-    'Рарка': 85
-  };
-
-  let rgd = 0;
-  const rgdDisplay = document.getElementById('rgd');
-
-  function updateRGD(amount) {
-    rgd += amount;
-    rgdDisplay.textContent = rgd;
-  }
-
-  function showSkinList() {
-    const container = document.getElementById('skinPreview');
-    container.innerHTML = '';
-    skins.forEach(skin => {
-      container.innerHTML += `
-        <div class="skin-item">
-          <img src="${skin.image}" alt="${skin.name}" />
-          <div>${skin.name}</div>
-          <small>${skin.rarity}</small>
-        </div>
-      `;
-    });
-  }
-
-  function openCase() {
-    if (rgd < 5) {
-      alert('Недостаточно RGD для открытия кейса!');
-      return;
-    }
-    updateRGD(-5);
-
-    const roll = Math.random() * 100;
-    let chosen;
-    let total = 0;
-    for (let skin of skins) {
-      total += rarityWeights[skin.rarity];
-      if (roll < total) {
-        chosen = skin;
-        break;
-      }
-    }
-    if (!chosen) chosen = skins[skins.length - 1];
-
-    alert(`Выпал скин: ${chosen.name} (${chosen.rarity})`);
-
-    if (chosen.rarity === 'Аркана') {
-      const animationContainer = document.getElementById('winAnimation');
-      const sound = document.getElementById('winSound');
-      for (let i = 0; i < 100; i++) {
-        const span = document.createElement('span');
-        span.textContent = 'WIN';
-        span.className = 'win-text';
-        span.style.left = Math.random() * window.innerWidth + 'px';
-        span.style.top = Math.random() * window.innerHeight + 'px';
-        animationContainer.appendChild(span);
-      }
-      sound.play();
-      setTimeout(() => {
-        animationContainer.innerHTML = '';
-      }, 3000);
-    }
-  }
-
-  showSkinList();
-</script>
-  <p>
-<div id="rgdDisplay" style="position: fixed; top: 10px; left: 10px; background: black; color: lime; padding: 10px; font-family: Arial; font-size: 18px; border-radius: 8px; z-index: 9999;">0 RGD</div>
-
+<!-- === СКРИПТ === -->
 <script>
 let rgd = 0;
-function addRGD(amount) {
-  rgd += amount;
-  document.getElementById("rgdDisplay").textContent = `${rgd} RGD`;
+let inventory = [];
+let promosUsed = {};
+
+const rarity = ["Рарка", "Эпик", "Легендарка", "Аркана"];
+const chances = [0.5, 0.3, 0.15, 0.05];
+const prices = {"Рарка": 3, "Эпик": 10, "Легендарка": 15, "Аркана": 20};
+const skins = {
+  "Рарка": ["R-skin1", "R-skin2", "R-skin3", "R-skin4", "R-skin5"],
+  "Эпик": ["E-skin1", "E-skin2", "E-skin3", "E-skin4", "E-skin5"],
+  "Легендарка": ["L-skin1", "L-skin2", "L-skin3", "L-skin4", "L-skin5"],
+  "Аркана": ["A-skin1", "A-skin2", "A-skin3", "A-skin4", "A-skin5"]
+};
+
+function updateRGD() {
+  document.getElementById("rgdCounter").textContent = `${rgd} RGD`;
 }
-</script>
 
-<!-- Угадай число -->
-<p>
-  <button onclick="playGuessNumber()">Играть: Угадай число</button>
-  <div id="guessResult"></div>
-  <script>
-    function playGuessNumber() {
-      const secret = 456
-      const guess = prompt("Угадай число от 1 до 1000");
-      const result = document.getElementById("guessResult");
-      if (parseInt(guess) === secret) {
-        result.innerHTML = '<span style="background: linear-gradient(90deg, red, green, blue); -webkit-background-clip: text; color: transparent; font-size: 24px;">привет!! ты угадал число напиши мне в standoff2 id 219167739</span>';
-        addRGD(10);
-      } else {
-        result.innerHTML = '<span style="color: red; font-size: 20px;">ТЫ НЕ УГАДАЛ ПОПРОБУЙ ЕЩЁ РАЗ</span>';
-      }
+function getRandomSkin() {
+  let rand = Math.random();
+  let sum = 0;
+  for (let i = 0; i < chances.length; i++) {
+    sum += chances[i];
+    if (rand <= sum) {
+      let r = rarity[i];
+      let s = skins[r][Math.floor(Math.random() * skins[r].length)];
+      return {rarity: r, name: s};
     }
-  </script>
-</p>
-
-<!-- Казино -->
-<p>
-  <button onclick="playCasino()">Играть в казино</button>
-  <div id="casinoResult"></div>
-  <script>
-    function playCasino() {
-      const result = Math.random() < 0.3;
-      const casinoDiv = document.getElementById("casinoResult");
-      if (result) {
-        casinoDiv.innerHTML = '<span style="background: linear-gradient(90deg, red, green, blue); -webkit-background-clip: text; color: transparent; font-size: 24px;">ты выиграл — напиши мне в Standoff2 id 219167739</span>';
-        addRGD(1);
-        showWinEffect();
-      } else {
-        casinoDiv.innerHTML = '<span style="color: red; font-size: 20px;">ты не угадал, попробуй ещё раз</span>';
-        showLoseEffect();
-      }
-    }
-  </script>
-</p>
-
-<!-- Win/Lose эффект -->
-<div id="effectOverlay" style="display:none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: black; color: white; font-size: 50px; font-family: Arial; justify-content: center; align-items: center; z-index: 9999;"></div>
-<script>
-  function showWinEffect() {
-    const overlay = document.getElementById("effectOverlay");
-    overlay.style.display = "flex";
-    overlay.style.color = "lime";
-    overlay.innerHTML = "WIN";
-    setTimeout(() => { overlay.style.display = "none"; }, 3000);
   }
-  function showLoseEffect() {
-    const overlay = document.getElementById("effectOverlay");
-    overlay.style.display = "flex";
-    overlay.style.color = "red";
-    overlay.innerHTML = "LOSER";
-    setTimeout(() => { overlay.style.display = "none"; }, 3000);
-  }
-</script>
+}
 
-<!-- Слот-машина -->
-<p>
-  <button onclick="playSlot()">Крутить слот</button>
-  <div id="slotResult"></div>
-  <script>
-    function playSlot() {
-      const r1 = Math.floor(Math.random() * 10);
-      const r2 = Math.floor(Math.random() * 10);
-      const r3 = Math.floor(Math.random() * 10);
-      const res = document.getElementById("slotResult");
-      res.innerHTML = `🎰 ${r1} | ${r2} | ${r3}`;
-      if (r1 === 7 && r2 === 7 && r3 === 7) {
-        res.innerHTML += '<br><span style="background: linear-gradient(90deg, red, green, blue); -webkit-background-clip: text; color: transparent; font-size: 24px;">ты выиграл — напиши мне в Standoff2 id 219167739</span>';
-        addRGD(5);
-        showWinEffect();
-      } else {
-        res.innerHTML += '<br><span style="color: red; font-size: 20px;">ты не угадал, попробуй ещё раз</span>';
-        showLoseEffect();
-      }
+function openCase() {
+  if (rgd < 5) return alert("Недостаточно RGD!");
+  rgd -= 5;
+  updateRGD();
+
+  const drop = getRandomSkin();
+  inventory.push(drop);
+  const el = document.createElement("div");
+  el.className = "skin rainbow";
+  el.innerHTML = `${drop.rarity}<br>${drop.name}`;
+  document.getElementById("dropArea").innerHTML = "";
+  document.getElementById("dropArea").appendChild(el);
+
+  if (drop.rarity === "Аркана") {
+    for (let i = 0; i < 100; i++) {
+      const winText = document.createElement("div");
+      winText.textContent = "WIN";
+      winText.style.position = "fixed";
+      winText.style.top = `${Math.random() * 100}%`;
+      winText.style.left = `${Math.random() * 100}%`;
+      winText.style.color = "lime";
+      winText.style.fontSize = "24px";
+      winText.style.zIndex = 99999;
+      document.body.appendChild(winText);
+      setTimeout(() => winText.remove(), 3000);
     }
-  </script>
-</p>
+    new Audio("https://www.myinstants.com/media/sounds/victory.mp3").play();
+  }
+}
+
+function toggleInventory() {
+  const modal = document.getElementById("inventoryModal");
+  modal.style.display = modal.style.display === "block" ? "none" : "block";
+  renderInventory();
+}
+
+function renderInventory() {
+  const container = document.getElementById("inventoryContent");
+  container.innerHTML = "";
+  inventory.forEach((item, index) => {
+    const div = document.createElement("div");
+    div.className = "skin";
+    div.innerHTML = `${item.rarity}<br>${item.name}`;
+    const sellBtn = document.createElement("button");
+    sellBtn.textContent = `Продать за ${prices[item.rarity]} RGD`;
+    sellBtn.className = "sellBtn";
+    sellBtn.onclick = () => {
+      rgd += prices[item.rarity];
+      updateRGD();
+      inventory.splice(index, 1);
+      renderInventory();
+    };
+    div.appendChild(sellBtn);
+    container.appendChild(div);
+  });
+}
+
+function applyPromo() {
+  const val = document.getElementById("promoInput").value.trim();
+  if (promosUsed[val]) return alert("Промо уже использован!");
+  if (val === "free") { rgd += 25; } // 5 прокрутов
+  else if (val === "3011") { rgd += 50; }
+  else if (val === "13.04") { rgd += 1304; }
+  else return alert("Неверный промокод!");
+  promosUsed[val] = true;
+  updateRGD();
+  alert("Промо применён!");
+  document.getElementById("promoPopup").style.display = "none";
+}
+
+document.getElementById("promoButton").onclick = () => {
+  const popup = document.getElementById("promoPopup");
+  popup.style.display = popup.style.display === "block" ? "none" : "block";
+};
+
+document.getElementById("caseOpenButton").onclick = openCase;
+updateRGD();
+</script>
 
 
 
