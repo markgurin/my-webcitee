@@ -500,230 +500,143 @@ QGX9RM6Z1Q — 10000 голды
   </script>
 </p>
 <p>
-<style>
-  .rgb-text {
-    font-weight: bold;
-    font-size: 20px;
-    background: linear-gradient(270deg, red, orange, yellow, green, cyan, blue, violet);
-    background-size: 1400% 1400%;
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    animation: rainbow 10s ease infinite;
-  }
-
-  @keyframes rainbow {
-    0% {background-position: 0% 50%;}
-    50% {background-position: 100% 50%;}
-    100% {background-position: 0% 50%;}
-  }
-
-  .rgd-counter {
-    position: fixed;
-    top: 10px;
-    left: 10px;
-    padding: 10px;
-    background: black;
-    color: lime;
-    font-weight: bold;
-    border-radius: 10px;
-    z-index: 9999;
-    font-family: monospace;
-  }
-
-  .case-button {
-    padding: 10px 20px;
-    background: gold;
-    color: black;
-    border: none;
-    border-radius: 10px;
-    font-weight: bold;
-    cursor: pointer;
-    transition: transform 0.3s;
-  }
-
-  .case-button:hover {
-    transform: scale(1.05);
-  }
-
-  .drop-animation {
-    margin-top: 20px;
-    width: 300px;
-    height: 100px;
-    border: 2px solid #fff;
-    overflow: hidden;
-    position: relative;
-    background: #111;
-    color: white;
-    font-family: sans-serif;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-
-  .drop-item {
-    position: absolute;
-    white-space: nowrap;
-    animation: scrollDrop 4s linear forwards;
-  }
-
-  @keyframes scrollDrop {
-    0% { left: 100%; }
-    100% { left: -100%; }
-  }
-</style>
-
-<div class="rgd-counter" id="rgdCounter">RGD: 0</div>
-<button class="case-button" onclick="openCase()">Открыть кейс (5 RGD)</button>
-<div class="drop-animation" id="dropAnimation"></div>
-
-<script>
-let rgd = 0;
-
-function addRGD(amount) {
-  rgd += amount;
-  updateRGD();
-}
-
-function spendRGD(amount) {
-  if (rgd >= amount) {
-    rgd -= amount;
-    updateRGD();
-    return true;
-  } else {
-    alert("Недостаточно RGD!");
-    return false;
-  }
-}
-
-function updateRGD() {
-  document.getElementById("rgdCounter").innerText = `RGD: ${rgd}`;
-}
-
-const skins = {
-  "Рарка": ["Desert Eagle | Toxic", "AKR | Carbon", "UMP45 | Arctic", "M4 | Samurai", "Famas | Beagle"],
-  "Эпик": ["AWM | Dragon", "AKR | Skull", "M16 | Winged", "Desert Eagle | Great", "UMP45 | Cerberus"],
-  "Легендарка": ["AKR12 | Railgun", "M4 | Predator", "Famas | Fury", "Desert Eagle | Cyber", "UMP45 | Beast"],
-  "Аркана": ["Karambit | Universe", "Butterfly | Flame", "M9 Bayonet | Frost", "Flip Knife | Lightning", "Gut Knife | Royal"]
-};
-
-const chances = {
-  "Рарка": 50,
-  "Эпик": 30,
-  "Легендарка": 15,
-  "Аркана": 5
-};
-
-function getRandomSkin() {
-  const roll = Math.random() * 100;
-  let cumulative = 0;
-  for (const rarity in chances) {
-    cumulative += chances[rarity];
-    if (roll < cumulative) {
-      const items = skins[rarity];
-      const randomItem = items[Math.floor(Math.random() * items.length)];
-      return `${rarity} — ${randomItem}`;
+  <style>
+    @keyframes rgb {
+      0% { color: red; }
+      33% { color: lime; }
+      66% { color: blue; }
+      100% { color: red; }
     }
-  }
-  return "Неизвестный скин";
-}
+    .rgb-text {
+      animation: rgb 2s infinite;
+      font-weight: bold;
+    }
+    #rgd-counter {
+      position: fixed;
+      top: 10px;
+      left: 10px;
+      background: black;
+      color: lime;
+      padding: 10px;
+      border: 2px solid lime;
+      border-radius: 10px;
+      z-index: 9999;
+    }
+    #inventory {
+      display: none;
+      position: fixed;
+      top: 50px;
+      right: 10px;
+      background: #111;
+      color: white;
+      padding: 10px;
+      border: 2px solid white;
+      border-radius: 10px;
+      max-height: 400px;
+      overflow-y: auto;
+      z-index: 9999;
+    }
+    #inventory button {
+      background: red;
+      color: white;
+      border: none;
+      padding: 5px;
+      margin: 3px;
+      cursor: pointer;
+    }
+    .case-skin {
+      padding: 5px;
+      margin: 5px;
+      border: 1px solid #fff;
+      border-radius: 5px;
+    }
+  </style>
 
-function openCase() {
-  if (!spendRGD(5)) return;
-  const drop = getRandomSkin();
-  const dropDiv = document.getElementById("dropAnimation");
-  dropDiv.innerHTML = `<div class='drop-item rgb-text'>${drop}</div>`;
-  addRGD(0); // Очки за кейс не начисляются, можно изменить
-}
+  <div id="rgd-counter">RGD: 0</div>
+  <button onclick="openCase()">Открыть кейс (5 RGD)</button>
+  <button onclick="toggleInventory()">Инвентарь</button>
+  <div id="inventory"></div>
+  <div id="case-drop"></div>
 
-// Пример: вручную начисляем RGD за другие мини-игры
-addRGD(10); // Можно вызывать из других игр
-</script>
+  <script>
+    const skins = {
+      "Rare": ["Desert Eagle | Blaze", "AKR | Sport", "M4 | Samurai", "FAMAS | Beagle", "USP | Venom"],
+      "Epic": ["AKR | Carbon", "M4 | Necromancer", "AWM | Gear", "TEC-9 | Space", "UMP45 | Pixel"],
+      "Legendary": ["M4 | Grand Prix", "AKR12 | Mechanism", "AWM | Treasure Hunter", "FAMAS | Monster", "P350 | Forest Spirit"],
+      "Arcana": ["Karambit | Gold", "M9 | Bayonet Dragon Glass", "Butterfly | Legacy", "Flip Knife | Arctic", "AKR | Tag King"]
+    };
+
+    const dropRates = {
+      "Rare": 50,
+      "Epic": 30,
+      "Legendary": 15,
+      "Arcana": 5
+    };
+
+    const prices = {
+      "Rare": 3,
+      "Epic": 10,
+      "Legendary": 15,
+      "Arcana": 20
+    };
+
+    let rgd = 0;
+    let inventory = [];
+
+    function updateRGD() {
+      document.getElementById("rgd-counter").innerText = `RGD: ${rgd}`;
+    }
+
+    function getRandomRarity() {
+      const roll = Math.random() * 100;
+      let sum = 0;
+      for (let rarity in dropRates) {
+        sum += dropRates[rarity];
+        if (roll <= sum) return rarity;
+      }
+    }
+
+    function openCase() {
+      if (rgd < 5) {
+        alert("Недостаточно RGD для открытия кейса!");
+        return;
+      }
+      rgd -= 5;
+      updateRGD();
+      const rarity = getRandomRarity();
+      const item = skins[rarity][Math.floor(Math.random() * skins[rarity].length)];
+      inventory.push({ name: item, rarity });
+      document.getElementById("case-drop").innerHTML = `<div class='rgb-text'>Выпал скин: ${item} (${rarity})</div>`;
+      showInventory();
+    }
+
+    function toggleInventory() {
+      const inv = document.getElementById("inventory");
+      inv.style.display = inv.style.display === "none" ? "block" : "none";
+      showInventory();
+    }
+
+    function showInventory() {
+      const inv = document.getElementById("inventory");
+      inv.innerHTML = '<h3>Инвентарь</h3>';
+      inventory.forEach((skin, index) => {
+        inv.innerHTML += `<div class='case-skin'>${skin.name} (${skin.rarity}) <button onclick='sell(${index})'>Продать (${prices[skin.rarity]} RGD)</button></div>`;
+      });
+    }
+
+    function sell(index) {
+      const skin = inventory[index];
+      rgd += prices[skin.rarity];
+      inventory.splice(index, 1);
+      updateRGD();
+      showInventory();
+    }
+
+    // Изначально начислим немного RGD для теста
+    rgd = 10;
+    updateRGD();
+  </script>
 </p>
-<style>
-  #rgdDisplay {
-    position: fixed;
-    top: 10px;
-    left: 10px;
-    background: rgba(0,0,0,0.7);
-    padding: 10px 15px;
-    border-radius: 10px;
-    color: #fff;
-    font-weight: bold;
-    z-index: 9999;
-  }
-  #inventory {
-    position: fixed;
-    top: 60px;
-    left: 10px;
-    background: rgba(0,0,0,0.8);
-    padding: 10px;
-    border-radius: 10px;
-    color: white;
-    max-height: 300px;
-    overflow-y: auto;
-    font-size: 14px;
-    z-index: 9999;
-  }
-  .skin-item {
-    margin-bottom: 6px;
-    border-bottom: 1px solid #fff2;
-    padding-bottom: 4px;
-  }
-  .sell-button {
-    background: red;
-    color: white;
-    border: none;
-    padding: 2px 6px;
-    margin-left: 10px;
-    border-radius: 6px;
-    cursor: pointer;
-  }
-</style>
-
-<div id="rgdDisplay">RGD: 0</div>
-<div id="inventory"><strong>Инвентарь:</strong><br></div>
-
-<script>
-let rgd = 0;
-let inventory = [];
-
-const prices = {
-  "Аркана": 20,
-  "Легендарка": 15,
-  "Эпик": 10,
-  "Рарка": 3
-};
-
-function updateRGD() {
-  document.getElementById("rgdDisplay").innerText = `RGD: ${rgd}`;
-}
-
-function updateInventoryUI() {
-  const invDiv = document.getElementById("inventory");
-  invDiv.innerHTML = '<strong>Инвентарь:</strong><br>';
-  inventory.forEach((item, index) => {
-    const el = document.createElement("div");
-    el.className = "skin-item";
-    el.innerHTML = `${item.name} (${item.rarity}) <button class="sell-button" onclick="sellSkin(${index})">Продать</button>`;
-    invDiv.appendChild(el);
-  });
-}
-
-function addToInventory(name, rarity) {
-  inventory.push({ name, rarity });
-  updateInventoryUI();
-}
-
-function sellSkin(index) {
-  const item = inventory[index];
-  if (prices[item.rarity]) {
-    rgd += prices[item.rarity];
-  }
-  inventory.splice(index, 1);
-  updateInventoryUI();
-  updateRGD();
-}
-</script>
 
 
 
