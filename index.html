@@ -499,244 +499,161 @@ QGX9RM6Z1Q — 10000 голды
     }
   </script>
 </p>
-<!-- === СТИЛИ === -->
-<style>
-  body {
-    margin: 0;
-    font-family: Arial, sans-serif;
-    overflow-x: hidden;
-  }
-  .rainbow {
-    animation: rainbow 2s linear infinite;
-  }
-  @keyframes rainbow {
-    0% {color: red;}
-    16% {color: orange;}
-    33% {color: yellow;}
-    50% {color: green;}
-    66% {color: blue;}
-    83% {color: indigo;}
-    100% {color: violet;}
-  }
-  #rgdCounter {
-    position: fixed;
-    top: 10px;
-    left: 10px;
-    padding: 5px 15px;
-    background: black;
-    color: white;
-    border-radius: 10px;
-    z-index: 9999;
-    font-weight: bold;
-  }
-  #promoButton {
-    position: fixed;
-    top: 10px;
-    right: 10px;
-    padding: 8px 14px;
-    background: linear-gradient(45deg, red, orange, yellow, green, blue, indigo, violet);
-    color: white;
-    font-weight: bold;
-    border: none;
-    border-radius: 12px;
-    cursor: pointer;
-    z-index: 9999;
-  }
-  #promoPopup {
-    position: fixed;
-    top: 60px;
-    right: 10px;
-    background: #111;
-    padding: 15px;
-    border-radius: 10px;
-    color: white;
-    display: none;
-    z-index: 9999;
-  }
-  #promoPopup input {
-    padding: 5px;
-    border-radius: 5px;
-    width: 150px;
-  }
-  #caseOpenButton {
-    margin: 20px;
-    padding: 10px 20px;
-    font-size: 18px;
-    cursor: pointer;
-    background: gold;
-    border: none;
-    border-radius: 8px;
-  }
-  #dropArea {
-    margin-top: 40px;
-    padding: 20px;
-    text-align: center;
-  }
-  .skin {
-    display: inline-block;
-    margin: 10px;
-    padding: 10px;
-    border-radius: 10px;
-    background: #222;
-    color: white;
-  }
-  .inventoryBtn {
-    position: fixed;
-    bottom: 10px;
-    left: 10px;
-    padding: 8px 14px;
-    background: #555;
-    color: white;
-    border-radius: 8px;
-    cursor: pointer;
-    z-index: 9999;
-  }
-  #inventoryModal {
-    display: none;
-    position: fixed;
-    top: 0; left: 0;
-    width: 100%; height: 100%;
-    background: rgba(0,0,0,0.8);
-    color: white;
-    padding: 20px;
-    z-index: 10000;
-    overflow-y: auto;
-  }
-  .sellBtn {
-    background: red;
-    color: white;
-    padding: 4px 8px;
-    border: none;
-    border-radius: 4px;
-    margin-top: 5px;
-    cursor: pointer;
-  }
-</style>
-
-<!-- === ЭЛЕМЕНТЫ UI === -->
-<div id="rgdCounter">0 RGD</div>
-<button id="promoButton">Promocode</button>
-<div id="promoPopup">
-  <input type="text" id="promoInput" placeholder="впиши промо" class="rainbow">
-  <button onclick="applyPromo()">OK</button>
-</div>
-<button id="caseOpenButton">Открыть кейс (5 RGD)</button>
-<div id="dropArea"></div>
-<button class="inventoryBtn" onclick="toggleInventory()">Инвентарь</button>
-<div id="inventoryModal"><h2>Твой инвентарь:</h2><div id="inventoryContent"></div></div>
-
-<!-- === СКРИПТ === -->
 <script>
-let rgd = 0;
-let inventory = [];
-let promosUsed = {};
+// ====== Глобальные переменные ======
+let rgd = localStorage.getItem('rgd') ? parseInt(localStorage.getItem('rgd')) : 0;
+let inventory = JSON.parse(localStorage.getItem('inventory') || '[]');
+let promoUsed = JSON.parse(localStorage.getItem('promoUsed') || '{}');
 
-const rarity = ["Рарка", "Эпик", "Легендарка", "Аркана"];
-const chances = [0.5, 0.3, 0.15, 0.05];
-const prices = {"Рарка": 3, "Эпик": 10, "Легендарка": 15, "Аркана": 20};
-const skins = {
-  "Рарка": ["R-skin1", "R-skin2", "R-skin3", "R-skin4", "R-skin5"],
-  "Эпик": ["E-skin1", "E-skin2", "E-skin3", "E-skin4", "E-skin5"],
-  "Легендарка": ["L-skin1", "L-skin2", "L-skin3", "L-skin4", "L-skin5"],
-  "Аркана": ["A-skin1", "A-skin2", "A-skin3", "A-skin4", "A-skin5"]
+const rarities = {
+  "Аркана": { chance: 1, color: "#00ff00", reward: 20 },
+  "Легендарка": { chance: 4, color: "#ff9900", reward: 15 },
+  "Эпик": { chance: 10, color: "#9900ff", reward: 10 },
+  "Рарка": { chance: 50, color: "#0000ff", reward: 3 },
 };
 
+const allSkins = {
+  "Аркана": ["Arcane 1", "Arcane 2", "Arcane 3", "Arcane 4", "Arcane 5"],
+  "Легендарка": ["Legend 1", "Legend 2", "Legend 3", "Legend 4", "Legend 5"],
+  "Эпик": ["Epic 1", "Epic 2", "Epic 3", "Epic 4", "Epic 5"],
+  "Рарка": ["Rare 1", "Rare 2", "Rare 3", "Rare 4", "Rare 5"]
+};
+
+updateRGD();
+
+// ====== Интерфейс RGD ======
+const rgdDisplay = document.createElement('div');
+rgdDisplay.style.position = 'fixed';
+rgdDisplay.style.top = '10px';
+rgdDisplay.style.left = '10px';
+rgdDisplay.style.padding = '10px';
+rgdDisplay.style.background = '#111';
+rgdDisplay.style.color = '#fff';
+rgdDisplay.style.border = '2px solid lime';
+rgdDisplay.innerText = `RGD: ${rgd}`;
+document.body.appendChild(rgdDisplay);
+
 function updateRGD() {
-  document.getElementById("rgdCounter").textContent = `${rgd} RGD`;
+  localStorage.setItem('rgd', rgd);
+  rgdDisplay.innerText = `RGD: ${rgd}`;
 }
 
-function getRandomSkin() {
-  let rand = Math.random();
-  let sum = 0;
-  for (let i = 0; i < chances.length; i++) {
-    sum += chances[i];
-    if (rand <= sum) {
-      let r = rarity[i];
-      let s = skins[r][Math.floor(Math.random() * skins[r].length)];
-      return {rarity: r, name: s};
-    }
-  }
+// ====== Кнопка открытия инвентаря ======
+const inventoryBtn = document.createElement('button');
+inventoryBtn.innerText = 'Инвентарь';
+inventoryBtn.style.position = 'fixed';
+inventoryBtn.style.bottom = '10px';
+inventoryBtn.style.left = '10px';
+inventoryBtn.style.zIndex = 1000;
+inventoryBtn.onclick = showInventory;
+document.body.appendChild(inventoryBtn);
+
+function showInventory() {
+  const invBox = document.createElement('div');
+  invBox.style.position = 'fixed';
+  invBox.style.top = '50px';
+  invBox.style.left = '50%';
+  invBox.style.transform = 'translateX(-50%)';
+  invBox.style.background = '#222';
+  invBox.style.padding = '20px';
+  invBox.style.color = '#fff';
+  invBox.style.maxHeight = '400px';
+  invBox.style.overflowY = 'scroll';
+  invBox.style.border = '2px solid white';
+  invBox.innerHTML = '<h3>Инвентарь</h3>';
+
+  inventory.forEach((item, index) => {
+    const skin = document.createElement('div');
+    skin.innerText = `${item.name} (${item.rarity})`;
+    skin.style.color = rarities[item.rarity].color;
+    skin.style.cursor = 'pointer';
+    skin.onclick = () => {
+      rgd += rarities[item.rarity].reward;
+      updateRGD();
+      inventory.splice(index, 1);
+      localStorage.setItem('inventory', JSON.stringify(inventory));
+      invBox.remove();
+      showInventory();
+    };
+    invBox.appendChild(skin);
+  });
+
+  const closeBtn = document.createElement('button');
+  closeBtn.innerText = 'Закрыть';
+  closeBtn.onclick = () => invBox.remove();
+  invBox.appendChild(closeBtn);
+  document.body.appendChild(invBox);
 }
 
+// ====== Кнопка промокодов ======
+const promoBtn = document.createElement('button');
+promoBtn.innerText = 'Promocode';
+promoBtn.style.position = 'fixed';
+promoBtn.style.top = '10px';
+promoBtn.style.right = '10px';
+promoBtn.style.zIndex = 1000;
+promoBtn.onclick = () => {
+  const code = prompt('%cВпиши промо', 'background: linear-gradient(to right, red, green, blue); color: white; font-weight: bold;');
+  if (!code || promoUsed[code]) return alert('Уже активирован или неправильный код');
+  let reward = 0;
+  if (code === 'free') reward = 25;
+  else if (code === '3011') reward = 50;
+  else if (code === '13.04') reward = 1304;
+  else return alert('Промо не найден');
+  rgd += reward;
+  updateRGD();
+  promoUsed[code] = true;
+  localStorage.setItem('promoUsed', JSON.stringify(promoUsed));
+};
+document.body.appendChild(promoBtn);
+
+// ====== Функция открытия кейса ======
 function openCase() {
-  if (rgd < 5) return alert("Недостаточно RGD!");
+  if (rgd < 5) return alert('Недостаточно RGD!');
   rgd -= 5;
   updateRGD();
 
-  const drop = getRandomSkin();
-  inventory.push(drop);
-  const el = document.createElement("div");
-  el.className = "skin rainbow";
-  el.innerHTML = `${drop.rarity}<br>${drop.name}`;
-  document.getElementById("dropArea").innerHTML = "";
-  document.getElementById("dropArea").appendChild(el);
+  const all = [];
+  for (let rarity in rarities) {
+    for (let i = 0; i < rarities[rarity].chance; i++) {
+      all.push(rarity);
+    }
+  }
+  const dropRarity = all[Math.floor(Math.random() * all.length)];
+  const skins = allSkins[dropRarity];
+  const skin = skins[Math.floor(Math.random() * skins.length)];
 
-  if (drop.rarity === "Аркана") {
+  inventory.push({ name: skin, rarity: dropRarity });
+  localStorage.setItem('inventory', JSON.stringify(inventory));
+  alert(`Выпал скин: ${skin} (${dropRarity})`);
+
+  if (dropRarity === 'Аркана') {
     for (let i = 0; i < 100; i++) {
-      const winText = document.createElement("div");
-      winText.textContent = "WIN";
-      winText.style.position = "fixed";
+      const winText = document.createElement('div');
+      winText.innerText = 'WIN';
+      winText.style.position = 'fixed';
       winText.style.top = `${Math.random() * 100}%`;
       winText.style.left = `${Math.random() * 100}%`;
-      winText.style.color = "lime";
-      winText.style.fontSize = "24px";
-      winText.style.zIndex = 99999;
+      winText.style.color = 'lime';
+      winText.style.fontSize = '30px';
+      winText.style.zIndex = 9999;
       document.body.appendChild(winText);
-      setTimeout(() => winText.remove(), 3000);
+      setTimeout(() => winText.remove(), 2000);
     }
-    new Audio("https://www.myinstants.com/media/sounds/victory.mp3").play();
+    const audio = new Audio('https://www.myinstants.com/media/sounds/mlg-airhorn.mp3');
+    audio.play();
   }
 }
 
-function toggleInventory() {
-  const modal = document.getElementById("inventoryModal");
-  modal.style.display = modal.style.display === "block" ? "none" : "block";
-  renderInventory();
-}
-
-function renderInventory() {
-  const container = document.getElementById("inventoryContent");
-  container.innerHTML = "";
-  inventory.forEach((item, index) => {
-    const div = document.createElement("div");
-    div.className = "skin";
-    div.innerHTML = `${item.rarity}<br>${item.name}`;
-    const sellBtn = document.createElement("button");
-    sellBtn.textContent = `Продать за ${prices[item.rarity]} RGD`;
-    sellBtn.className = "sellBtn";
-    sellBtn.onclick = () => {
-      rgd += prices[item.rarity];
-      updateRGD();
-      inventory.splice(index, 1);
-      renderInventory();
-    };
-    div.appendChild(sellBtn);
-    container.appendChild(div);
-  });
-}
-
-function applyPromo() {
-  const val = document.getElementById("promoInput").value.trim();
-  if (promosUsed[val]) return alert("Промо уже использован!");
-  if (val === "free") { rgd += 25; } // 5 прокрутов
-  else if (val === "3011") { rgd += 50; }
-  else if (val === "13.04") { rgd += 1304; }
-  else return alert("Неверный промокод!");
-  promosUsed[val] = true;
-  updateRGD();
-  alert("Промо применён!");
-  document.getElementById("promoPopup").style.display = "none";
-}
-
-document.getElementById("promoButton").onclick = () => {
-  const popup = document.getElementById("promoPopup");
-  popup.style.display = popup.style.display === "block" ? "none" : "block";
-};
-
-document.getElementById("caseOpenButton").onclick = openCase;
-updateRGD();
+// ====== Кнопка открытия кейса ======
+const caseBtn = document.createElement('button');
+caseBtn.innerText = 'Открыть кейс';
+caseBtn.style.position = 'fixed';
+caseBtn.style.bottom = '10px';
+caseBtn.style.right = '10px';
+caseBtn.onclick = openCase;
+document.body.appendChild(caseBtn);
 </script>
-
 
 
 
