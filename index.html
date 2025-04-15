@@ -639,6 +639,91 @@ function openCase() {
 addRGD(10); // Можно вызывать из других игр
 </script>
 </p>
+<style>
+  #rgdDisplay {
+    position: fixed;
+    top: 10px;
+    left: 10px;
+    background: rgba(0,0,0,0.7);
+    padding: 10px 15px;
+    border-radius: 10px;
+    color: #fff;
+    font-weight: bold;
+    z-index: 9999;
+  }
+  #inventory {
+    position: fixed;
+    top: 60px;
+    left: 10px;
+    background: rgba(0,0,0,0.8);
+    padding: 10px;
+    border-radius: 10px;
+    color: white;
+    max-height: 300px;
+    overflow-y: auto;
+    font-size: 14px;
+    z-index: 9999;
+  }
+  .skin-item {
+    margin-bottom: 6px;
+    border-bottom: 1px solid #fff2;
+    padding-bottom: 4px;
+  }
+  .sell-button {
+    background: red;
+    color: white;
+    border: none;
+    padding: 2px 6px;
+    margin-left: 10px;
+    border-radius: 6px;
+    cursor: pointer;
+  }
+</style>
+
+<div id="rgdDisplay">RGD: 0</div>
+<div id="inventory"><strong>Инвентарь:</strong><br></div>
+
+<script>
+let rgd = 0;
+let inventory = [];
+
+const prices = {
+  "Аркана": 20,
+  "Легендарка": 15,
+  "Эпик": 10,
+  "Рарка": 3
+};
+
+function updateRGD() {
+  document.getElementById("rgdDisplay").innerText = `RGD: ${rgd}`;
+}
+
+function updateInventoryUI() {
+  const invDiv = document.getElementById("inventory");
+  invDiv.innerHTML = '<strong>Инвентарь:</strong><br>';
+  inventory.forEach((item, index) => {
+    const el = document.createElement("div");
+    el.className = "skin-item";
+    el.innerHTML = `${item.name} (${item.rarity}) <button class="sell-button" onclick="sellSkin(${index})">Продать</button>`;
+    invDiv.appendChild(el);
+  });
+}
+
+function addToInventory(name, rarity) {
+  inventory.push({ name, rarity });
+  updateInventoryUI();
+}
+
+function sellSkin(index) {
+  const item = inventory[index];
+  if (prices[item.rarity]) {
+    rgd += prices[item.rarity];
+  }
+  inventory.splice(index, 1);
+  updateInventoryUI();
+  updateRGD();
+}
+</script>
 
 
 
