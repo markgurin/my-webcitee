@@ -632,6 +632,79 @@ QGX9RM6Z1Q — 10000 голды
   updateBalance();
 </script>
 </p>
+<p>
+<style>
+  #pointsDisplay {
+    position: fixed;
+    top: 10px;
+    left: 10px;
+    background: linear-gradient(90deg, red, green, blue);
+    color: white;
+    padding: 10px 20px;
+    font-size: 20px;
+    font-weight: bold;
+    border-radius: 10px;
+    box-shadow: 0 0 15px rgba(255,255,255,0.7);
+    z-index: 9999;
+  }
+  .point-animation {
+    position: fixed;
+    top: 50px;
+    left: 20px;
+    font-size: 20px;
+    font-weight: bold;
+    color: lime;
+    animation: floatUp 1s ease-out;
+    z-index: 9999;
+  }
+  @keyframes floatUp {
+    0% { opacity: 1; transform: translateY(0); }
+    100% { opacity: 0; transform: translateY(-40px); }
+  }
+</style>
+
+<div id="pointsDisplay">RGD: <span id="points">0</span></div>
+<div id="pointsAnimationContainer"></div>
+
+<script>
+  let points = parseInt(localStorage.getItem("rgdPoints")) || 0;
+  const pointsDisplay = document.getElementById("points");
+  const animationContainer = document.getElementById("pointsAnimationContainer");
+
+  function updatePointsDisplay() {
+    pointsDisplay.textContent = points;
+    localStorage.setItem("rgdPoints", points);
+  }
+
+  function addPoints(amount) {
+    points += amount;
+    updatePointsDisplay();
+    playSound();
+    animatePoints("+" + amount);
+  }
+
+  function animatePoints(text) {
+    const anim = document.createElement("div");
+    anim.className = "point-animation";
+    anim.textContent = text;
+    animationContainer.appendChild(anim);
+    setTimeout(() => anim.remove(), 1000);
+  }
+
+  function playSound() {
+    const audio = new Audio("https://cdn.pixabay.com/download/audio/2022/03/15/audio_89d3835c36.mp3?filename=correct-answer-2-37956.mp3");
+    audio.volume = 0.5;
+    audio.play();
+  }
+
+  updatePointsDisplay();
+
+  // Пример добавления очков (замени на вызов в своих играх)
+  // addPoints(1); // казино
+  // addPoints(5); // викторина
+  // addPoints(10); // угадай число
+</script>
+</p>
 
 
 
